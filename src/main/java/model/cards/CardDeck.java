@@ -3,30 +3,46 @@ package model.cards;
 import java.util.Collections;
 import java.util.List;
 
-public class CardDeck {
-    private List<Card> deck;
+public class CardDeck implements ICardDeck {
+    private List<ICard> deck;
 
-    public CardDeck(List<Card> deck) {
+    public CardDeck(List<ICard> deck) {
+
         this.deck = deck;
     }
 
-    public List<Card> getDeck() {
+    public List<ICard> getDeck() {
         return deck;
     }
 
-    public void setDeck(List<Card> deck) {
+    public void setDeck(List<ICard> deck) {
         this.deck = deck;
     }
 
+    @Override
     public void shuffle() {
         Collections.shuffle(deck);
     }
 
-    public boolean hasCards() {
-        return deck.size() != 0;
+    @Override
+    public boolean isEmpty() {
+        return deck.isEmpty();
     }
 
-    public Card getCard() {
-        return deck.get(0);
+    @Override
+    public boolean containsCard(ICard iCard) {
+        return deck.contains(iCard);
+    }
+
+    @Override
+    public ICard getCardFromTop() {
+        ICard card = deck.get(0);
+        deck.remove(0);
+        return card;
+    }
+
+    @Override
+    public void removeCard(ICard iCard) {
+        deck.remove(iCard);
     }
 }

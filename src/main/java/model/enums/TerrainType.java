@@ -1,5 +1,9 @@
 package model.enums;
 
 public enum TerrainType {
-    BEACH, MEADOW, HILLS, MOUNTAINS, RIVER
+    BEACH,
+    MEADOW,
+    HILLS,
+    MOUNTAINS,
+    RIVER
 }

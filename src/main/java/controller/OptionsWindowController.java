@@ -4,7 +4,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import model.ChoosedCharacter;
+import model.enums.ProfessionType;
+import model.enums.SexType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OptionsWindowController {
     @FXML
@@ -15,9 +20,17 @@ public class OptionsWindowController {
 
     @FXML
     void onAction(ActionEvent event) {
-        ((Stage) rootPane.getScene().getWindow()).close();
+//        ((Stage) rootPane.getScene().getWindow()).close();
 
-//        GameEngineController gameEngineController = new GameEngineController();
+//        mock
+        int scenarioId = 1;
+        List<ChoosedCharacter> choosedCharacters = new ArrayList<>();
+        choosedCharacters.add(new ChoosedCharacter(ProfessionType.CARPENTER, SexType.MAN));
+        choosedCharacters.add(new ChoosedCharacter(ProfessionType.COOK, SexType.WOMAN));
+        boolean isFriday = true;
+        boolean isDog = true;
+
+        GameEngineController gameEngineController = new GameEngineController(scenarioId, choosedCharacters, isFriday, isDog);
 
 //        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../gameWindow.fxml"));
 //        Parent root2 = fxmlLoader.load();
