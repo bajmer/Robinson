@@ -25,11 +25,6 @@ public class CardDeck implements ICardDeck {
     }
 
     @Override
-    public boolean isEmpty() {
-        return deck.isEmpty();
-    }
-
-    @Override
     public boolean containsCard(ICard iCard) {
         return deck.contains(iCard);
     }
@@ -39,6 +34,14 @@ public class CardDeck implements ICardDeck {
         ICard card = deck.get(0);
         deck.remove(0);
         return card;
+    }
+
+    @Override
+    public ICard getCard(ICard iCard) {
+        if (deck.contains(iCard)) {
+            deck.remove(iCard);
+            return iCard;
+        }
     }
 
     @Override

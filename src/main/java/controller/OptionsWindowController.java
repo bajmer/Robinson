@@ -4,12 +4,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-import model.ChoosedCharacter;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OptionsWindowController {
     @FXML
@@ -24,13 +23,21 @@ public class OptionsWindowController {
 
 //        mock
         int scenarioId = 1;
-        List<ChoosedCharacter> choosedCharacters = new ArrayList<>();
-        choosedCharacters.add(new ChoosedCharacter(ProfessionType.CARPENTER, SexType.MAN));
-        choosedCharacters.add(new ChoosedCharacter(ProfessionType.COOK, SexType.WOMAN));
+        Map<ProfessionType, SexType> choosedCharacters = new HashMap<>();
+        choosedCharacters.put(ProfessionType.CARPENTER, SexType.MAN);
+        choosedCharacters.put(ProfessionType.COOK, SexType.WOMAN);
         boolean isFriday = true;
         boolean isDog = true;
+        int wreckageCardId = 1;
+        int startingItemsNumber = 2;
 
-        GameEngineController gameEngineController = new GameEngineController(scenarioId, choosedCharacters, isFriday, isDog);
+        GameEngineController gameEngineController = new GameEngineController(
+                scenarioId,
+                choosedCharacters,
+                isFriday,
+                isDog,
+                wreckageCardId,
+                startingItemsNumber);
 
 //        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../gameWindow.fxml"));
 //        Parent root2 = fxmlLoader.load();

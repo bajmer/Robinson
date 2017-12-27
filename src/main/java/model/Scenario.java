@@ -2,38 +2,13 @@ package model;
 
 public class Scenario implements IScenario {
     private int id;
-    private int maxRoundNumber;
+    private int roundsNumber;
     private int round;
 
-    public Scenario(int id) {
+    public Scenario(int id, int roundsNumber) {
         this.id = id;
+        this.roundsNumber = roundsNumber;
         this.round = 1;
-        switch (this.id) {
-            case 1:
-                this.maxRoundNumber = 12;
-                break;
-            case 2:
-                this.maxRoundNumber = 10;
-                break;
-            case 3:
-                this.maxRoundNumber = 12;
-                break;
-            case 4:
-                this.maxRoundNumber = 12;
-                break;
-            case 5:
-                this.maxRoundNumber = 12;
-                break;
-            case 6:
-                this.maxRoundNumber = 12;
-                break;
-            case 7:
-                this.maxRoundNumber = 12;
-                break;
-            default:
-                this.maxRoundNumber = 12;
-                break;
-        }
     }
 
     public int getId() {
@@ -44,12 +19,12 @@ public class Scenario implements IScenario {
         this.id = id;
     }
 
-    public int getMaxRoundNumber() {
-        return maxRoundNumber;
+    public int getRoundsNumber() {
+        return roundsNumber;
     }
 
-    public void setMaxRoundNumber(int maxRoundNumber) {
-        this.maxRoundNumber = maxRoundNumber;
+    public void setRoundsNumber(int roundsNumber) {
+        this.roundsNumber = roundsNumber;
     }
 
     public int getRound() {
@@ -103,7 +78,8 @@ public class Scenario implements IScenario {
     }
 
     public boolean nextRound() {
-        this.round += 1;
-        return this.round > maxRoundNumber;
+        round += 1;
+        return round > roundsNumber;
     }
+
 }

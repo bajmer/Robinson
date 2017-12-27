@@ -1,6 +1,6 @@
 package model.enums.cards;
 
-public enum EventType {
+public enum EventEffectType {
     WINTER_DEPRESSION,
     CHRONIC_TIREDNESS,
     HIGH_WATER,
@@ -71,5 +71,9 @@ public enum EventType {
     PRECIPICE,
     JAGUAR,
     RAVENOUS_PREDATORS,
-    OTTERS
+    OTTERS,
+    //    *********WRECKAGE EVENTS************
+    FOOD_CRATES,
+    WRECKED_LIFEBOAT,
+    CAPTAINS_CHEST
 }

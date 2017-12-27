@@ -9,109 +9,12 @@ public class BeastCard implements ICard {
     private int foodAmount;
     private int hideAmount;
 
-    public BeastCard(BeastType beast) {
-
+    public BeastCard(BeastType beast, int strength, int weaponLevelDecrease, int foodAmount, int hideAmount) {
         this.beast = beast;
-
-        switch (beast) {
-            case ALLIGATOR:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case BEAR:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case BIRDS:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case BOA:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case CHAMOIS:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case CHEETAH:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case FOX:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case GOATS:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case GORILLA:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case IGUANA:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case JAGUAR:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case PUMA:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case TAPIR:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case TIGER:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case WILD_DOG:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-            case WILD_PIG:
-                this.strength = 0;
-                this.weaponLevelDecrease = 0;
-                this.foodAmount = 0;
-                this.hideAmount = 0;
-                break;
-        }
-
+        this.strength = strength;
+        this.weaponLevelDecrease = weaponLevelDecrease;
+        this.foodAmount = foodAmount;
+        this.hideAmount = hideAmount;
     }
 
     public BeastType getBeast() {
