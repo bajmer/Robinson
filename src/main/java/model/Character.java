@@ -3,58 +3,37 @@ package model;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 import model.enums.SpecialSkillType;
+import model.enums.cards.InventionType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Character implements ICharacter {
-    private static final int MAX_LIFE = 10;
     private ProfessionType profession;
     private SexType sex;
+    private InventionType personalInvention;
+    private List<SpecialSkillType> specialSkills;
+    private List<Integer> moraleDown;
     private int life;
     private int determination;
     private boolean firstPlayer;
-    private List<SpecialSkillType> specialSkills;
-    private List<Integer> moraleDown;
 
-    public Character(ProfessionType profession, SexType sex) {
+    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life) {
         this.profession = profession;
         this.sex = sex;
-        this.life = MAX_LIFE;
-        this.determination = 0;
-        this.firstPlayer = false;
-        this.specialSkills = new ArrayList<>();
-        this.moraleDown = new ArrayList<>();
-
-        switch (profession) {
-            case CARPENTER:
-                this.specialSkills.add(SpecialSkillType.ECONOMICAL_CONSTRUCTION);
-                this.specialSkills.add(SpecialSkillType.CRAFT);
-                this.specialSkills.add(SpecialSkillType.NEW_IDEA);
-                this.specialSkills.add(SpecialSkillType.HANDYMAN);
-                break;
-            case COOK:
-                this.specialSkills.add(SpecialSkillType.GRANDMAS_RECIPE);
-                this.specialSkills.add(SpecialSkillType.SHARP_EYE);
-                this.specialSkills.add(SpecialSkillType.NAIL_SOUP);
-                this.specialSkills.add(SpecialSkillType.HOOCH);
-                break;
-            case EXPLORER:
-                this.specialSkills.add(SpecialSkillType.LUCKY_MAN);
-                this.specialSkills.add(SpecialSkillType.RECONNAISSANCE);
-                this.specialSkills.add(SpecialSkillType.MOTIVATIONAL_SPEECH);
-                this.specialSkills.add(SpecialSkillType.SCOUT);
-                break;
-            case SOLDIER:
-                this.specialSkills.add(SpecialSkillType.TRACKING);
-                this.specialSkills.add(SpecialSkillType.HOUNTING);
-                this.specialSkills.add(SpecialSkillType.FURY);
-                this.specialSkills.add(SpecialSkillType.EMERGENCY_PLAN);
-                break;
-        }
-
+        this.personalInvention = personalInvention;
         this.specialSkills = specialSkills;
         this.moraleDown = moraleDown;
+        this.life = life;
+        this.determination = 0;
+        this.firstPlayer = false;
+    }
+
+    public InventionType getPersonalInvention() {
+        return personalInvention;
+    }
+
+    public void setPersonalInvention(InventionType personalInvention) {
+        this.personalInvention = personalInvention;
     }
 
     public ProfessionType getProfession() {

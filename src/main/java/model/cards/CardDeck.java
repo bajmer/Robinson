@@ -1,51 +1,21 @@
 package model.cards;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
-public class CardDeck implements ICardDeck {
-    private List<ICard> deck;
+public class CardDeck {
+    private LinkedList<ICard> deck;
 
-    public CardDeck(List<ICard> deck) {
-
-        this.deck = deck;
+    public CardDeck() {
+        deck = new LinkedList<>();
     }
 
-    public List<ICard> getDeck() {
+    public LinkedList<ICard> getDeck() {
         return deck;
     }
 
-    public void setDeck(List<ICard> deck) {
+    public void setDeck(LinkedList<ICard> deck) {
         this.deck = deck;
     }
 
-    @Override
-    public void shuffle() {
-        Collections.shuffle(deck);
-    }
 
-    @Override
-    public boolean containsCard(ICard iCard) {
-        return deck.contains(iCard);
-    }
-
-    @Override
-    public ICard getCardFromTop() {
-        ICard card = deck.get(0);
-        deck.remove(0);
-        return card;
-    }
-
-    @Override
-    public ICard getCard(ICard iCard) {
-        if (deck.contains(iCard)) {
-            deck.remove(iCard);
-            return iCard;
-        }
-    }
-
-    @Override
-    public void removeCard(ICard iCard) {
-        deck.remove(iCard);
-    }
 }

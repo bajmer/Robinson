@@ -2,6 +2,8 @@ package model.cards;
 
 import model.enums.cards.BeastType;
 
+import java.util.List;
+
 public class BeastCard implements ICard {
     private BeastType beast;
     private int strength;
@@ -9,12 +11,12 @@ public class BeastCard implements ICard {
     private int foodAmount;
     private int hideAmount;
 
-    public BeastCard(BeastType beast, int strength, int weaponLevelDecrease, int foodAmount, int hideAmount) {
+    public BeastCard(BeastType beast, List<Integer> parameters) {
         this.beast = beast;
-        this.strength = strength;
-        this.weaponLevelDecrease = weaponLevelDecrease;
-        this.foodAmount = foodAmount;
-        this.hideAmount = hideAmount;
+        this.strength = parameters.get(0);
+        this.weaponLevelDecrease = parameters.get(1);
+        this.foodAmount = parameters.get(2);
+        this.hideAmount = parameters.get(3);
     }
 
     public BeastType getBeast() {

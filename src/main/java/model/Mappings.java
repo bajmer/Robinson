@@ -1,15 +1,20 @@
 package model;
 
+import model.enums.ProfessionType;
+import model.enums.SpecialSkillType;
 import model.enums.cards.*;
 
 import java.util.*;
 
+import static model.enums.ProfessionType.*;
+import static model.enums.SpecialSkillType.*;
 import static model.enums.cards.BeastType.*;
 import static model.enums.cards.BuildingAdventureType.*;
 import static model.enums.cards.EventEffectType.*;
-import static model.enums.cards.EventIconType.BOOK;
+import static model.enums.cards.EventIconType.*;
 import static model.enums.cards.ExplorationAdventureType.*;
 import static model.enums.cards.GatheringResourcesAdventureType.*;
+import static model.enums.cards.InventionType.*;
 import static model.enums.cards.ThreatActionType.THREAT_ACTION;
 import static model.enums.cards.ThreatEffectType.THREAT_EFFECT;
 
@@ -21,12 +26,13 @@ public class Mappings {
     private static Map<Integer, BuildingAdventureType> idToBuildingAdvntureMapping = new HashMap<>();
     private static Map<Integer, GatheringResourcesAdventureType> idToGatheringAdventureMapping = new HashMap<>();
     private static Map<Integer, ExplorationAdventureType> idToExplorationAdventureMapping = new HashMap<>();
-    //    private static Map<BeastType, Integer> beastToStrenghtMapping = new HashMap<>();
-//    private static Map<BeastType, Integer> beastToWeaponLevelDecreaseMapping = new HashMap<>();
-//    private static Map<BeastType, Integer> beastToFoodAmountMapping = new HashMap<>();
-//    private static Map<BeastType, Integer> beastToHideAmountMapping = new HashMap<>();
     private static Map<BeastType, List<Integer>> beastToBeastStatsMapping = new HashMap<>();
     private static Map<Integer, Integer> scenarioIdToRoundsNumberMapping = new HashMap<>();
+    private static Map<InventionType, Boolean> inventionTypeToIsMandatoryMapping = new HashMap<>();
+    private static Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping = new HashMap<>();
+    private static Map<ProfessionType, InventionType> professionToPersonalInventionMapping = new HashMap<>();
+    private static Map<ProfessionType, List<Integer>> professionToMoraleDownMapping = new HashMap<>();
+    private static Map<ProfessionType, Integer> professionToLifeMapping = new HashMap<>();
 
     public Mappings() {
 //        ******WRECKAGE CARDS******
@@ -75,7 +81,7 @@ public class Mappings {
         idToEventEffectMapping.put(42, HEAVY_CLOUDS);
         idToEventEffectMapping.put(43, RAVAGING_HURRICANE);
         idToEventEffectMapping.put(44, RAVISHING_WINDSTORM);
-        idToEventEffectMapping.put(45, FIRE);
+        idToEventEffectMapping.put(45, EventEffectType.FIRE);
         idToEventEffectMapping.put(46, SLEEPLESS_NIGHT);
         idToEventEffectMapping.put(47, PREDATOR_IS_NEAR);
         idToEventEffectMapping.put(48, STORM);
@@ -202,26 +208,26 @@ public class Mappings {
 //        idToEventEffectMapping.put(166, );
 //
         idToEventIconMapping.put(1, BOOK);
-//        idToEventIconMapping.put(2, );
-//        idToEventIconMapping.put(3, );
-//        idToEventIconMapping.put(4, );
-//        idToEventIconMapping.put(5, );
-//        idToEventIconMapping.put(6, );
-//        idToEventIconMapping.put(7, );
-//        idToEventIconMapping.put(8, );
-//        idToEventIconMapping.put(9, );
-//        idToEventIconMapping.put(10, );
-//        idToEventIconMapping.put(11, );
-//        idToEventIconMapping.put(12, );
-//        idToEventIconMapping.put(13, );
-//        idToEventIconMapping.put(14, );
-//        idToEventIconMapping.put(15, );
-//        idToEventIconMapping.put(16, );
-//        idToEventIconMapping.put(17, );
-//        idToEventIconMapping.put(18, );
-//        idToEventIconMapping.put(19, );
-//        idToEventIconMapping.put(20, );
-//        idToEventIconMapping.put(21, );
+        idToEventIconMapping.put(2, BOOK);
+        idToEventIconMapping.put(3, BOOK);
+        idToEventIconMapping.put(4, BOOK);
+        idToEventIconMapping.put(5, BOOK);
+        idToEventIconMapping.put(6, BOOK);
+        idToEventIconMapping.put(7, BOOK);
+        idToEventIconMapping.put(8, BOOK);
+        idToEventIconMapping.put(9, BOOK);
+        idToEventIconMapping.put(10, BOOK);
+        idToEventIconMapping.put(11, BROWN_QUESTIONMARK);
+        idToEventIconMapping.put(12, BROWN_QUESTIONMARK);
+        idToEventIconMapping.put(13, BROWN_QUESTIONMARK);
+        idToEventIconMapping.put(14, BROWN_QUESTIONMARK);
+        idToEventIconMapping.put(15, GREEN_QUESTIONMARK);
+        idToEventIconMapping.put(16, GREEN_QUESTIONMARK);
+        idToEventIconMapping.put(17, GREEN_QUESTIONMARK);
+        idToEventIconMapping.put(18, GREEN_QUESTIONMARK);
+        idToEventIconMapping.put(19, GRAY_QUESTIONMARK);
+        idToEventIconMapping.put(20, GRAY_QUESTIONMARK);
+        idToEventIconMapping.put(21, GRAY_QUESTIONMARK);
 //        idToEventIconMapping.put(22, );
 //        idToEventIconMapping.put(23, );
 //        idToEventIconMapping.put(24, );
@@ -708,6 +714,101 @@ public class Mappings {
         scenarioIdToRoundsNumberMapping.put(5, 12);
         scenarioIdToRoundsNumberMapping.put(6, 12);
         scenarioIdToRoundsNumberMapping.put(7, 12);
+
+        inventionTypeToIsMandatoryMapping.put(BOW, true);
+        inventionTypeToIsMandatoryMapping.put(BRICKS, true);
+        inventionTypeToIsMandatoryMapping.put(DAM, true);
+        inventionTypeToIsMandatoryMapping.put(InventionType.FIRE, true);
+        inventionTypeToIsMandatoryMapping.put(KNIFE, true);
+        inventionTypeToIsMandatoryMapping.put(MAP, true);
+        inventionTypeToIsMandatoryMapping.put(POT, true);
+        inventionTypeToIsMandatoryMapping.put(ROPE, true);
+        inventionTypeToIsMandatoryMapping.put(SHOVEL, true);
+        inventionTypeToIsMandatoryMapping.put(BASKET, false);
+        inventionTypeToIsMandatoryMapping.put(BED, false);
+        inventionTypeToIsMandatoryMapping.put(BELTS, false);
+        inventionTypeToIsMandatoryMapping.put(CELLAR, false);
+        inventionTypeToIsMandatoryMapping.put(CORRAL, false);
+        inventionTypeToIsMandatoryMapping.put(CURE, false);
+        inventionTypeToIsMandatoryMapping.put(DIARY, false);
+        inventionTypeToIsMandatoryMapping.put(DRUMS, false);
+        inventionTypeToIsMandatoryMapping.put(FIREPLACE, false);
+        inventionTypeToIsMandatoryMapping.put(FURNACE, false);
+        inventionTypeToIsMandatoryMapping.put(LANTERN, false);
+        inventionTypeToIsMandatoryMapping.put(MOAT, false);
+        inventionTypeToIsMandatoryMapping.put(PIT, false);
+        inventionTypeToIsMandatoryMapping.put(RAFT, false);
+        inventionTypeToIsMandatoryMapping.put(SACK, false);
+        inventionTypeToIsMandatoryMapping.put(SHIELD, false);
+        inventionTypeToIsMandatoryMapping.put(SHORTCUT, false);
+        inventionTypeToIsMandatoryMapping.put(SLING, false);
+        inventionTypeToIsMandatoryMapping.put(SNARE, false);
+        inventionTypeToIsMandatoryMapping.put(SPEAR, false);
+        inventionTypeToIsMandatoryMapping.put(WALL, false);
+
+        professionToPersonalInventionMapping.put(CARPENTER, SNARE);
+        professionToPersonalInventionMapping.put(COOK, FIREPLACE);
+        professionToPersonalInventionMapping.put(EXPLORER, SHORTCUT);
+        professionToPersonalInventionMapping.put(SOLDIER, SPEAR);
+
+        professionToSpecialSkillMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(
+                ECONOMICAL_CONSTRUCTION, CRAFT, NEW_IDEA, HANDYMAN)));
+        professionToSpecialSkillMapping.put(COOK, new ArrayList<>(Arrays.asList(
+                GRANDMAS_RECIPE, SHARP_EYE, NAIL_SOUP, HOOCH)));
+        professionToSpecialSkillMapping.put(EXPLORER, new ArrayList<>(Arrays.asList(
+                LUCKY_MAN, RECONNAISSANCE, MOTIVATIONAL_SPEECH, SCOUT)));
+        professionToSpecialSkillMapping.put(SOLDIER, new ArrayList<>(Arrays.asList(
+                TRACKING, HOUNTING, FURY, EMERGENCY_PLAN)));
+
+        professionToMoraleDownMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(8, 5, 3)));
+        professionToMoraleDownMapping.put(COOK, new ArrayList<>(Arrays.asList(9, 6, 4, 2)));
+        professionToMoraleDownMapping.put(EXPLORER, new ArrayList<>(Arrays.asList(6, 1)));
+        professionToMoraleDownMapping.put(SOLDIER, new ArrayList<>(Arrays.asList(7, 3)));
+
+        professionToLifeMapping.put(CARPENTER, 13);
+        professionToLifeMapping.put(COOK, 13);
+        professionToLifeMapping.put(EXPLORER, 12);
+        professionToLifeMapping.put(SOLDIER, 12);
+    }
+
+    public static Map<ProfessionType, Integer> getProfessionToLifeMapping() {
+        return professionToLifeMapping;
+    }
+
+    public static void setProfessionToLifeMapping(Map<ProfessionType, Integer> professionToLifeMapping) {
+        Mappings.professionToLifeMapping = professionToLifeMapping;
+    }
+
+    public static Map<ProfessionType, List<Integer>> getProfessionToMoraleDownMapping() {
+        return professionToMoraleDownMapping;
+    }
+
+    public static void setProfessionToMoraleDownMapping(Map<ProfessionType, List<Integer>> professionToMoraleDownMapping) {
+        Mappings.professionToMoraleDownMapping = professionToMoraleDownMapping;
+    }
+
+    public static Map<ProfessionType, InventionType> getProfessionToPersonalInventionMapping() {
+        return professionToPersonalInventionMapping;
+    }
+
+    public static void setProfessionToPersonalInventionMapping(Map<ProfessionType, InventionType> professionToPersonalInventionMapping) {
+        Mappings.professionToPersonalInventionMapping = professionToPersonalInventionMapping;
+    }
+
+    public static Map<ProfessionType, List<SpecialSkillType>> getProfessionToSpecialSkillMapping() {
+        return professionToSpecialSkillMapping;
+    }
+
+    public static void setProfessionToSpecialSkillMapping(Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping) {
+        Mappings.professionToSpecialSkillMapping = professionToSpecialSkillMapping;
+    }
+
+    public static Map<InventionType, Boolean> getInventionTypeToIsMandatoryMapping() {
+        return inventionTypeToIsMandatoryMapping;
+    }
+
+    public static void setInventionTypeToIsMandatoryMapping(Map<InventionType, Boolean> inventionTypeToIsMandatoryMapping) {
+        Mappings.inventionTypeToIsMandatoryMapping = inventionTypeToIsMandatoryMapping;
     }
 
     public static Map<Integer, Integer> getScenarioIdToRoundsNumberMapping() {

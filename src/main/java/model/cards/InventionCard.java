@@ -7,18 +7,10 @@ public class InventionCard implements ICard {
     private boolean isMandatory;
     private boolean isIdea;
 
-    public InventionCard(InventionType invention) {
+    public InventionCard(InventionType invention, boolean isMandatory) {
         this.invention = invention;
+        this.isMandatory = isMandatory;
         this.isIdea = false;
-        isMandatory = invention == InventionType.BOW
-                || invention == InventionType.BRICKS
-                || invention == InventionType.DAM
-                || invention == InventionType.FIRE
-                || invention == InventionType.KNIFE
-                || invention == InventionType.MAP
-                || invention == InventionType.POT
-                || invention == InventionType.ROPE
-                || invention == InventionType.SHOVEL;
     }
 
     public InventionType getInvention() {

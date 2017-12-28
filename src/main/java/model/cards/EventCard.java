@@ -6,7 +6,7 @@ import model.enums.cards.ThreatActionType;
 import model.enums.cards.ThreatEffectType;
 
 public class EventCard implements ICard {
-    private static final int firstId = 3;
+    private static final int firstId = 4;
     private static final int lastId = 76;
     private EventEffectType eventEffect;
     private EventIconType eventIcon;

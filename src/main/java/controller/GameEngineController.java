@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
 class GameEngineController {
@@ -31,7 +31,6 @@ class GameEngineController {
     private CardDeck explorationAdventuresCardsDeck;
     private CardDeck hountingCardsDeck;
     private CardDeck mysteryCardsDeck;
-    private CardDeck startingItemCardsDeck;
     private PhaseType phase;
 
 
@@ -45,13 +44,21 @@ class GameEngineController {
         mappings = new Mappings();
 
 //        tworzenie scenariusza
-        this.scenario = new Scenario(scenarioId, Mappings.getScenarioIdToRoundsNumberMapping().get(scenarioId));
+        scenario = new Scenario(scenarioId, Mappings.getScenarioIdToRoundsNumberMapping().get(scenarioId));
         logger.info("Utworzono scenariusz");
 
 //        tworzenie postaci
-        this.charactersInfo = new CharactersInfo();
+        charactersInfo = new CharactersInfo();
         for (Map.Entry<ProfessionType, SexType> entry : choosedCharacters.entrySet()) {
-            this.charactersInfo.getCharacters().add(new Character(entry.getKey(), entry.getValue()));
+            ProfessionType profession = entry.getKey();
+            SexType sex = entry.getValue();
+            charactersInfo.getCharacters().add(new Character(
+                    profession,
+                    sex,
+                    Mappings.getProfessionToPersonalInventionMapping().get(profession),
+                    Mappings.getProfessionToSpecialSkillMapping().get(profession),
+                    Mappings.getProfessionToMoraleDownMapping().get(profession),
+                    Mappings.getProfessionToLifeMapping().get(profession)));
         }
         this.isFriday = isFriday;
         this.isDog = isDog;
@@ -61,24 +68,24 @@ class GameEngineController {
         logger.info("Utworzono postacie");
 
 //        karty wydarzeń
-        List<ICard> allEventsCards = new ArrayList<>();
-        for (int i = EventCard.getFirstId(); i < EventCard.getLastId(); i++) {
-            allEventsCards.add(new EventCard(
+        CardDeck allEventsCardsDeck = new CardDeck();
+        for (int i = EventCard.getFirstId(); i <= EventCard.getLastId(); i++) {
+            allEventsCardsDeck.getDeck().add(new EventCard(
                     Mappings.getIdToEventEffectMapping().get(i),
                     Mappings.getIdToEventIconMapping().get(i),
                     Mappings.getIdToThreatActionMapping().get(i),
                     Mappings.getIdToThreatEffectMapping().get(i)));
         }
-        CardDeck allEventsCardsDeck = new CardDeck(allEventsCards);
-        allEventsCardsDeck.shuffle();
+        Collections.shuffle(allEventsCardsDeck.getDeck());
 
-        eventCardsDeck = new CardDeck(new ArrayList<>());
+        eventCardsDeck = new CardDeck();
         int bookIconsCounter = 0;
         int questionmarkIconsCouter = 0;
-        for (ICard card : eventCardsDeck.getDeck()) {
+
+        for (ICard card : allEventsCardsDeck.getDeck()) {
             EventCard eventCard = (EventCard) card;
             if (eventCard.getEventIcon() == EventIconType.BOOK && bookIconsCounter < scenario.getRoundsNumber() / 2) {
-                eventCardsDeck.getDeck().add(eventCardsDeck.);
+                eventCardsDeck.getDeck().add(eventCard);
                 bookIconsCounter++;
                 continue;
             }
@@ -86,39 +93,58 @@ class GameEngineController {
                     eventCard.getEventIcon() == EventIconType.GRAY_QUESTIONMARK ||
                     eventCard.getEventIcon() == EventIconType.GREEN_QUESTIONMARK) &&
                     questionmarkIconsCouter < scenario.getRoundsNumber() / 2) {
-                eventCardsDeck.putCartOnTop(eventCard);
-                bookIconsCounter++;
+                eventCardsDeck.getDeck().add(eventCard);
+                questionmarkIconsCouter++;
             }
         }
 
         logger.info("Przygotowano talię wydarzeń");
         for (ICard iCard : eventCardsDeck.getDeck()) {
-            System.out.println(iCard);
+            logger.info(iCard.toString());
         }
-
 
 //        karty pomysłów
-        List<ICard> inventionCards = new ArrayList<>();
-        Arrays.asList(InventionType.values()).forEach(inventionType -> inventionCards.add(new InventionCard(inventionType)));
-        this.inventionCardsDeck = new CardDeck(inventionCards);
+        inventionCardsDeck = new CardDeck();
+        Arrays.asList(InventionType.values()).forEach(inventionType -> inventionCardsDeck.getDeck().add(
+                new InventionCard(inventionType, Mappings.getInventionTypeToIsMandatoryMapping().get(inventionType))));
 
-        for (ICard card : inventionCardsDeck.getDeck()) {
-            InventionCard inventionCard = (InventionCard) card;
-            if (inventionCard.isMandatory()) {
-                charactersInfo.getIdeas().add(inventionCard);
+        for (int i = 0; i < 13; i++) {
+            InventionCard card = (InventionCard) inventionCardsDeck.getDeck().removeFirst();
+            if (i < 9) {
+                charactersInfo.getIdeas().add(card);
+            } else {
+                for (Map.Entry entry : Mappings.getProfessionToPersonalInventionMapping().entrySet()) {
+                    if (card.getInvention().equals(entry.getValue())) {
+                        for (Character character : charactersInfo.getCharacters()) {
+                            if (character.getProfession().equals(entry.getKey())) {
+                                charactersInfo.getIdeas().add(card);
+                            }
+                        }
+                    }
+                }
             }
         }
-        this.inventionCardsDeck.shuffle();
+
+        Collections.shuffle(inventionCardsDeck.getDeck());
         for (int i = 0; i < 5; i++) {
-            charactersInfo.getIdeas().add((InventionCard) inventionCardsDeck.getCardFromTop());
+            charactersInfo.getIdeas().add((InventionCard) inventionCardsDeck.getDeck().removeFirst());
         }
         logger.info("Wylosowano karty pomysłow");
+        for (InventionCard invention : charactersInfo.getIdeas()) {
+            logger.info(invention);
+        }
 
-////        karty przygód
-//        List<ICard> buildingAdventureCards = new ArrayList<>();
-//        Arrays.asList(BuildingAdventureType.values()).forEach((adventureType, effectType) -> buildingAdventureCards.add(new BuildingAdventureCard(adventureType, effectType)));
-//        this.buildingAdventuresCardsDeck = new CardDeck(buildingAdventureCards);
-//        this.buildingAdventuresCardsDeck.shuffle();
+
+        logger.info("Pozostałe:");
+        for (ICard card : inventionCardsDeck.getDeck()) {
+            InventionCard invention = (InventionCard) card;
+            logger.info(invention);
+        }
+
+//        karty przygód
+//        buildingAdventuresCardsDeck = new CardDeck();
+//        Arrays.asList(BuildingAdventureType.values()).forEach((adventureType, effectType) -> buildingAdventuresCardsDeck.getDeck().add(new BuildingAdventureCard(adventureType, effectType)));
+//        buildingAdventuresCardsDeck.getDeck();
 //
 //        List<ICard> gatheringResourceAdventureCards = new ArrayList<>();
 //        Arrays.asList(GatheringResourcesAdventureType.values()).forEach(adventureType -> gatheringResourceAdventureCards.add(new GatheringResourcesAdventureCard(adventureType, effectType)));
@@ -130,46 +156,33 @@ class GameEngineController {
 //        this.explorationAdventuresCardsDeck = new CardDeck(explorationAdventureCards);
 //        this.explorationAdventuresCardsDeck.shuffle();
 //        logger.info("Przygotowano talie przygód");
-//
-////        karty wydarzeń
-//        List<ICard> eventCards = new ArrayList<>();
-//        Arrays.asList(EventEffectType.values()).forEach(eventEffectType -> eventCards.add(new EventCard(eventEffectType, group)));
-//        this.eventCardsDeck = new CardDeck(eventCards);
-//        logger.info("Przygotowano talię wydarzeń");
 
 //        karty bestii
-        List<ICard> beastCards = new ArrayList<>();
-        Arrays.asList(BeastType.values()).forEach(beastType -> beastCards.add(new BeastCard(
-                beastType,
-                Mappings.getBeastToBeastStatsMapping().get(beastType).get(0),
-                Mappings.getBeastToBeastStatsMapping().get(beastType).get(1),
-                Mappings.getBeastToBeastStatsMapping().get(beastType).get(2),
-                Mappings.getBeastToBeastStatsMapping().get(beastType).get(3))));
-        this.hountingCardsDeck = new CardDeck(beastCards);
-        this.hountingCardsDeck.shuffle();
+        hountingCardsDeck = new CardDeck();
+        Arrays.asList(BeastType.values()).forEach(beastType -> hountingCardsDeck.getDeck().add(new BeastCard(
+                beastType, Mappings.getBeastToBeastStatsMapping().get(beastType))));
+        Collections.shuffle(hountingCardsDeck.getDeck());
         logger.info("Przygotowano talię bestii");
 
 //        karty tajemnic
-        List<ICard> mysteryCards = new ArrayList<>();
-        Arrays.asList(MysteryTreasureType.values()).forEach(mysteryType -> mysteryCards.add(new MysteryTreasureCard(mysteryType)));
-        Arrays.asList(MysteryMonsterType.values()).forEach(mysteryType -> mysteryCards.add(new MysteryMonsterCard(mysteryType)));
-        Arrays.asList(MysteryTrapType.values()).forEach(mysteryType -> mysteryCards.add(new MysteryTrapCard(mysteryType)));
-        this.mysteryCardsDeck = new CardDeck(mysteryCards);
-        this.mysteryCardsDeck.shuffle();
+        mysteryCardsDeck = new CardDeck();
+        Arrays.asList(MysteryTreasureType.values()).forEach(mysteryType -> mysteryCardsDeck.getDeck().add(new MysteryTreasureCard(mysteryType)));
+        Arrays.asList(MysteryMonsterType.values()).forEach(mysteryType -> mysteryCardsDeck.getDeck().add(new MysteryMonsterCard(mysteryType)));
+        Arrays.asList(MysteryTrapType.values()).forEach(mysteryType -> mysteryCardsDeck.getDeck().add(new MysteryTrapCard(mysteryType)));
+        Collections.shuffle(mysteryCardsDeck.getDeck());
         logger.info("Przygotowano talię tajemnic");
 
 //        karty przedmiotów startowych
-        List<ICard> startingItemCards = new ArrayList<>();
-        Arrays.asList(StartingItemType.values()).forEach(startingItemType -> startingItemCards.add(new StartingItemCard(startingItemType)));
-        this.startingItemCardsDeck = new CardDeck(startingItemCards);
-        this.startingItemCardsDeck.shuffle();
+        CardDeck startingItemCardsDeck = new CardDeck();
+        Arrays.asList(StartingItemType.values()).forEach(startingItemType -> startingItemCardsDeck.getDeck().add(new StartingItemCard(startingItemType)));
+        Collections.shuffle(startingItemCardsDeck.getDeck());
 
-        this.charactersInfo.setStartingItems(new ArrayList<>());
+        charactersInfo.setStartingItems(new ArrayList<>());
         for (int i = 0; i < startingItemsNumber; i++) {
-            this.charactersInfo.getStartingItems().add((StartingItemCard) this.startingItemCardsDeck.getCardFromTop());
+            charactersInfo.getStartingItems().add((StartingItemCard) startingItemCardsDeck.getDeck().removeFirst());
         }
         logger.info("Wylosowano przedmioty startowe: ");
-        for (ICard card : this.charactersInfo.getStartingItems()) {
+        for (ICard card : charactersInfo.getStartingItems()) {
             logger.info(card);
         }
     }
