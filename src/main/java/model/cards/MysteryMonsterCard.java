@@ -1,6 +1,6 @@
 package model.cards;
 
-import model.enums.cards.MysteryMonsterType;
+import model.enums.cards.mysterycards.MysteryMonsterType;
 
 public class MysteryMonsterCard implements ICard {
     private MysteryMonsterType monsterType;

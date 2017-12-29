@@ -8,7 +8,18 @@ import model.cards.*;
 import model.enums.PhaseType;
 import model.enums.ProfessionType;
 import model.enums.SexType;
-import model.enums.cards.*;
+import model.enums.cards.BeastType;
+import model.enums.cards.InventionType;
+import model.enums.cards.StartingItemType;
+import model.enums.cards.adventurecards.BuildingAdventureType;
+import model.enums.cards.adventurecards.ExplorationAdventureType;
+import model.enums.cards.adventurecards.GatheringResourcesAdventureType;
+import model.enums.cards.eventcards.EventEffectType;
+import model.enums.cards.eventcards.EventIconType;
+import model.enums.cards.mysterycards.MysteryMonsterType;
+import model.enums.cards.mysterycards.MysteryTrapType;
+import model.enums.cards.mysterycards.MysteryTreasureType;
+import model.enums.cards.wreckagecards.WreckageEventEffectType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,7 +49,7 @@ class GameEngineController {
                                 Map<ProfessionType, SexType> choosedCharacters,
                                 boolean isFriday,
                                 boolean isDog,
-                                int wreckageCardId,
+                                WreckageEventEffectType wreckageEvent,
                                 int startingItemsNumber) {
 
         mappings = new Mappings();
@@ -69,16 +80,20 @@ class GameEngineController {
 
 //        karty wydarzeń
         CardDeck allEventsCardsDeck = new CardDeck();
-        for (int i = EventCard.getFirstId(); i <= EventCard.getLastId(); i++) {
-            allEventsCardsDeck.getDeck().add(new EventCard(
-                    Mappings.getIdToEventEffectMapping().get(i),
-                    Mappings.getIdToEventIconMapping().get(i),
-                    Mappings.getIdToThreatActionMapping().get(i),
-                    Mappings.getIdToThreatEffectMapping().get(i)));
-        }
+        Arrays.asList(EventEffectType.values()).forEach(eventEffect -> allEventsCardsDeck.getDeck().add(new EventCard(
+                eventEffect,
+                Mappings.getEventEffectToEventIconMapping().get(eventEffect),
+                Mappings.getEventEffectToThreatActionMapping().get(eventEffect),
+                Mappings.getEventEffectToThreatEffectMapping().get(eventEffect))));
         Collections.shuffle(allEventsCardsDeck.getDeck());
 
         eventCardsDeck = new CardDeck();
+
+        eventCardsDeck.getDeck().add(new WreckageCard(
+                wreckageEvent,
+                Mappings.getWreckageEventToWreckageThreatActionMapping().get(wreckageEvent),
+                Mappings.getWreckageEventToWreckageThreatEffectMapping().get(wreckageEvent)));
+
         int bookIconsCounter = 0;
         int questionmarkIconsCouter = 0;
 
@@ -89,9 +104,9 @@ class GameEngineController {
                 bookIconsCounter++;
                 continue;
             }
-            if ((eventCard.getEventIcon() == EventIconType.BROWN_QUESTIONMARK ||
-                    eventCard.getEventIcon() == EventIconType.GRAY_QUESTIONMARK ||
-                    eventCard.getEventIcon() == EventIconType.GREEN_QUESTIONMARK) &&
+            if ((eventCard.getEventIcon() == EventIconType.BUILDING_ADVENTURE ||
+                    eventCard.getEventIcon() == EventIconType.GATHERING_RESOURCES_ADVENTURE ||
+                    eventCard.getEventIcon() == EventIconType.EXPLORATION_ADVENTURE) &&
                     questionmarkIconsCouter < scenario.getRoundsNumber() / 2) {
                 eventCardsDeck.getDeck().add(eventCard);
                 questionmarkIconsCouter++;
@@ -142,20 +157,21 @@ class GameEngineController {
         }
 
 //        karty przygód
-//        buildingAdventuresCardsDeck = new CardDeck();
-//        Arrays.asList(BuildingAdventureType.values()).forEach((adventureType, effectType) -> buildingAdventuresCardsDeck.getDeck().add(new BuildingAdventureCard(adventureType, effectType)));
-//        buildingAdventuresCardsDeck.getDeck();
-//
-//        List<ICard> gatheringResourceAdventureCards = new ArrayList<>();
-//        Arrays.asList(GatheringResourcesAdventureType.values()).forEach(adventureType -> gatheringResourceAdventureCards.add(new GatheringResourcesAdventureCard(adventureType, effectType)));
-//        this.gatheringResourcesAdventureCardsDeck = new CardDeck(gatheringResourceAdventureCards);
-//        this.gatheringResourcesAdventureCardsDeck.shuffle();
-//
-//        List<ICard> explorationAdventureCards = new ArrayList<>();
-//        Arrays.asList(ExplorationAdventureType.values()).forEach(adventureType -> explorationAdventureCards.add(new ExplorationAdventureCard(adventureType, effectType)));
-//        this.explorationAdventuresCardsDeck = new CardDeck(explorationAdventureCards);
-//        this.explorationAdventuresCardsDeck.shuffle();
-//        logger.info("Przygotowano talie przygód");
+        buildingAdventuresCardsDeck = new CardDeck();
+        Arrays.asList(BuildingAdventureType.values()).forEach(adventureType -> buildingAdventuresCardsDeck.getDeck().add(
+                new BuildingAdventureCard(adventureType, Mappings.getBuildingAdvntureToAdventureEventEffectMapping().get(adventureType))));
+        Collections.shuffle(buildingAdventuresCardsDeck.getDeck());
+
+        gatheringResourcesAdventureCardsDeck = new CardDeck();
+        Arrays.asList(GatheringResourcesAdventureType.values()).forEach(adventureType -> gatheringResourcesAdventureCardsDeck.getDeck().add(
+                new GatheringResourcesAdventureCard(adventureType, Mappings.getGatheringAdventureToAdventureEventEffectMapping().get(adventureType))));
+        Collections.shuffle(gatheringResourcesAdventureCardsDeck.getDeck());
+
+        explorationAdventuresCardsDeck = new CardDeck();
+        Arrays.asList(ExplorationAdventureType.values()).forEach(adventureType -> explorationAdventuresCardsDeck.getDeck().add(
+                new ExplorationAdventureCard(adventureType, Mappings.getExplorationAdventureToAdventureEventEffectMapping().get(adventureType))));
+        Collections.shuffle(explorationAdventuresCardsDeck.getDeck());
+        logger.info("Przygotowano talie przygód");
 
 //        karty bestii
         hountingCardsDeck = new CardDeck();

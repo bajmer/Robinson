@@ -1,13 +1,11 @@
 package model.cards;
 
-import model.enums.cards.EventEffectType;
-import model.enums.cards.EventIconType;
-import model.enums.cards.ThreatActionType;
-import model.enums.cards.ThreatEffectType;
+import model.enums.cards.eventcards.EventEffectType;
+import model.enums.cards.eventcards.EventIconType;
+import model.enums.cards.eventcards.ThreatActionType;
+import model.enums.cards.eventcards.ThreatEffectType;
 
 public class EventCard implements ICard {
-    private static final int firstId = 4;
-    private static final int lastId = 76;
     private EventEffectType eventEffect;
     private EventIconType eventIcon;
     private ThreatActionType dangerAction;
@@ -18,14 +16,6 @@ public class EventCard implements ICard {
         this.eventIcon = eventIcon;
         this.dangerAction = dangerAction;
         this.dangerEffect = dangerEffect;
-    }
-
-    public static int getFirstId() {
-        return firstId;
-    }
-
-    public static int getLastId() {
-        return lastId;
     }
 
     public EventEffectType getEventEffect() {

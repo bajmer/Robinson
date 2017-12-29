@@ -1,4 +1,4 @@
-package model.enums.cards;
+package model.enums.cards.eventcards;
 
 public enum EventEffectType {
     WINTER_DEPRESSION,
@@ -11,7 +11,8 @@ public enum EventEffectType {
     POISONING,
     CULLED_AREA,
     BODY_ON_THE_BEACH,
-    COLD_RAIN, //2x
+    COLD_RAIN_1,
+    COLD_RAIN_2,
     MEMORIES_OF_THE_CRUISE,
     THUNDERSTORM,
     PREDATORS,
@@ -44,7 +45,8 @@ public enum EventEffectType {
     FIRE,
     SLEEPLESS_NIGHT,
     PREDATOR_IS_NEAR,
-    STORM, // (2X, TEXT LITTLE DIFFERENT)
+    STORM_1,
+    STORM_2,
     EXHAUSTING_NIGHT,
     BROKEN_TREE,
     STRONG_WIND,
@@ -72,8 +74,4 @@ public enum EventEffectType {
     JAGUAR,
     RAVENOUS_PREDATORS,
     OTTERS,
-    //    *********WRECKAGE EVENTS************
-    FOOD_CRATES,
-    WRECKED_LIFEBOAT,
-    CAPTAINS_CHEST
 }

@@ -1,4 +1,4 @@
-package model.enums.cards;
+package model.enums.cards.mysterycards;
 
 public enum MysteryMonsterType {
     GORILLA,

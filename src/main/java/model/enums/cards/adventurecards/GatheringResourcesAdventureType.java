@@ -1,7 +1,11 @@
-package model.enums.cards;
+package model.enums.cards.adventurecards;
 
 public enum GatheringResourcesAdventureType {
-    END_OF_SOURCE, //x5
+    END_OF_SOURCE_1,
+    END_OF_SOURCE_2,
+    END_OF_SOURCE_3,
+    END_OF_SOURCE_4,
+    END_OF_SOURCE_5,
     WINTER_FREEZING,
     UNEXPECTED_DISCOVERY,
     FURS,

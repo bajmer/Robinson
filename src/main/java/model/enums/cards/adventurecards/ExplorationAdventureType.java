@@ -1,4 +1,4 @@
-package model.enums.cards;
+package model.enums.cards.adventurecards;
 
 public enum ExplorationAdventureType {
     WRONG_TRACK,
@@ -9,7 +9,8 @@ public enum ExplorationAdventureType {
     BAMBOO,
     OLD_HUT,
     OLD_GRAVE,
-    SIGNS_OF_FIRE, //2x
+    SIGNS_OF_FIRE_1,
+    SIGNS_OF_FIRE_2,
     SHRINE,
     WILD_BERRIES,
     VIPERS,

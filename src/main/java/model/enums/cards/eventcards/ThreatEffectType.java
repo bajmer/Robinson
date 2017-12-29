@@ -1,4 +1,4 @@
-package model.enums.cards;
+package model.enums.cards.eventcards;
 
 public enum ThreatEffectType {
     THREAT_EFFECT

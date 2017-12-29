@@ -1,8 +1,9 @@
-package model.enums.cards;
+package model.enums.cards.adventurecards;
 
 public enum BuildingAdventureType {
     TOOL_BREAKS,
-    LABORIOUS_WORK, //x2
+    LABORIOUS_WORK_1,
+    LABORIOUS_WORK_2,
     CONSTRUCTION,
     UNMOTIVATED,
     FAST_WORK,

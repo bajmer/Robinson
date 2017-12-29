@@ -1,13 +1,13 @@
 package model.cards;
 
-import model.enums.cards.EventEffectType;
-import model.enums.cards.ExplorationAdventureType;
+import model.enums.cards.adventurecards.AdventureEventEffectType;
+import model.enums.cards.adventurecards.ExplorationAdventureType;
 
 public class ExplorationAdventureCard implements ICard {
     private ExplorationAdventureType adventureType;
-    private EventEffectType effectType;
+    private AdventureEventEffectType effectType;
 
-    public ExplorationAdventureCard(ExplorationAdventureType adventureType, EventEffectType effectType) {
+    public ExplorationAdventureCard(ExplorationAdventureType adventureType, AdventureEventEffectType effectType) {
         this.adventureType = adventureType;
         this.effectType = effectType;
     }
