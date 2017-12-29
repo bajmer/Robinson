@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.cards.InventionType;
 
-public class InventionCard implements ICard {
+public class InventionCard implements Usable {
     private InventionType invention;
     private boolean isMandatory;
     private boolean isIdea;
@@ -38,7 +38,7 @@ public class InventionCard implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 

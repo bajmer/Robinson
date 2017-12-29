@@ -4,7 +4,7 @@ import model.enums.cards.wreckagecards.WreckageEventEffectType;
 import model.enums.cards.wreckagecards.WreckageThreatActionType;
 import model.enums.cards.wreckagecards.WreckageThreatEffectType;
 
-public class WreckageCard implements ICard {
+public class WreckageCard implements Usable {
     private WreckageEventEffectType wreckageEventEffect;
     private WreckageThreatActionType wreckageThreatAction;
     private WreckageThreatEffectType wreckageThreatEffect;
@@ -16,7 +16,7 @@ public class WreckageCard implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 

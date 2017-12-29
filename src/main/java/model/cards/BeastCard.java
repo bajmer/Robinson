@@ -4,7 +4,7 @@ import model.enums.cards.BeastType;
 
 import java.util.List;
 
-public class BeastCard implements ICard {
+public class BeastCard implements Usable {
     private BeastType beast;
     private int strength;
     private int weaponLevelDecrease;
@@ -60,7 +60,7 @@ public class BeastCard implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 }

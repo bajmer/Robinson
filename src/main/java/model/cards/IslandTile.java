@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.TerrainType;
 
-public class IslandTile implements ICard {
+public class IslandTile implements Usable {
     private int id;
     private TerrainType terrainType;
     private boolean hasWoodSource;
@@ -88,7 +88,7 @@ public class IslandTile implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 }

@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.cards.DiscoveryTokenType;
 
-public class DiscoveryToken implements ICard {
+public class DiscoveryToken implements Usable {
 
     private DiscoveryTokenType discoveryToken;
 
@@ -11,7 +11,7 @@ public class DiscoveryToken implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 }

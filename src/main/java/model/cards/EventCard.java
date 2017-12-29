@@ -5,7 +5,7 @@ import model.enums.cards.eventcards.EventIconType;
 import model.enums.cards.eventcards.ThreatActionType;
 import model.enums.cards.eventcards.ThreatEffectType;
 
-public class EventCard implements ICard {
+public class EventCard implements Usable {
     private EventEffectType eventEffect;
     private EventIconType eventIcon;
     private ThreatActionType dangerAction;
@@ -51,7 +51,7 @@ public class EventCard implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 

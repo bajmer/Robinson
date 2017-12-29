@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.cards.mysterycards.MysteryTrapType;
 
-public class MysteryTrapCard implements ICard {
+public class MysteryTrapCard implements Usable {
     private MysteryTrapType trapType;
 
     public MysteryTrapCard(MysteryTrapType trapType) {
@@ -11,7 +11,7 @@ public class MysteryTrapCard implements ICard {
 
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 }

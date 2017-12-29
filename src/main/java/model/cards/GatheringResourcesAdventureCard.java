@@ -3,7 +3,7 @@ package model.cards;
 import model.enums.cards.adventurecards.AdventureEventEffectType;
 import model.enums.cards.adventurecards.GatheringResourcesAdventureType;
 
-public class GatheringResourcesAdventureCard implements ICard {
+public class GatheringResourcesAdventureCard implements Usable {
     private GatheringResourcesAdventureType adventureType;
     private AdventureEventEffectType effectType;
 
@@ -13,7 +13,7 @@ public class GatheringResourcesAdventureCard implements ICard {
     }
 
     @Override
-    public void useCard() {
+    public void use() {
 
     }
 }
