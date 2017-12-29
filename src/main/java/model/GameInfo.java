@@ -6,7 +6,7 @@ import model.cards.StartingItemCard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharactersInfo {
+public class GameInfo {
     private List<Character> characters;
     private List<InventionCard> ideas;
     private List<InventionCard> inventions;
@@ -15,11 +15,14 @@ public class CharactersInfo {
     private Resources avaibleResources;
     private Resources futureResources;
 
-    public CharactersInfo() {
+    public GameInfo() {
         this.characters = new ArrayList<>();
         this.ideas = new ArrayList<>();
         this.inventions = new ArrayList<>();
         this.startingItems = new ArrayList<>();
+        charactersStats = new CharactersStats();
+        avaibleResources = new Resources();
+        futureResources = new Resources();
     }
 
     public List<Character> getCharacters() {

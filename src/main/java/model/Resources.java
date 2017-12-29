@@ -6,6 +6,13 @@ public class Resources {
     private int longExpiryDateFoodsAmount;
     private int hideAmount;
 
+    public Resources() {
+        woodAmount = 0;
+        foodAmount = 0;
+        longExpiryDateFoodsAmount = 0;
+        hideAmount = 0;
+    }
+
     public int getWoodAmount() {
         return woodAmount;
     }

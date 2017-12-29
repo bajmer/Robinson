@@ -1,8 +1,8 @@
-package model;
+package model.cards;
 
 import model.enums.TerrainType;
 
-public class IslandTile {
+public class IslandTile implements ICard {
     private int id;
     private TerrainType terrainType;
     private boolean hasWoodSource;
@@ -85,5 +85,10 @@ public class IslandTile {
 
     public void setHasNaturalShelter(boolean hasNaturalShelter) {
         this.hasNaturalShelter = hasNaturalShelter;
+    }
+
+    @Override
+    public void useCard() {
+
     }
 }

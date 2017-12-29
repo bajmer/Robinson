@@ -6,6 +6,13 @@ public class CharactersStats {
     private int palisadeLevel;
     private int weaponLevel;
 
+    public CharactersStats() {
+        moraleLevel = 0;
+        roofLevel = 0;
+        palisadeLevel = 0;
+        weaponLevel = 0;
+    }
+
     public int getMoraleLevel() {
         return moraleLevel;
     }

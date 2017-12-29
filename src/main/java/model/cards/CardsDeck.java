@@ -2,10 +2,10 @@ package model.cards;
 
 import java.util.LinkedList;
 
-public class CardDeck {
+public class CardsDeck {
     private LinkedList<ICard> deck;
 
-    public CardDeck() {
+    public CardsDeck() {
         deck = new LinkedList<>();
     }
 
