@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-class GameEngineController {
+public class GameEngineController {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
     private Scenario scenario;
     private GameInfo gameInfo;
@@ -274,5 +274,11 @@ class GameEngineController {
         Collections.shuffle(islandTilesStack.getStack());
 
         logger.info("Przygotowano stos kafelków wyspy");
+    }
+
+    public void nextPhase() {
+        logger.info("Faza: " + phase);
+        phase = Mappings.getCurrentPhaseToNextPhaseMapping().get(phase);
+        logger.info("Faza: " + phase);
     }
 }

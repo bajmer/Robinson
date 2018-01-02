@@ -1,9 +1,6 @@
 package model;
 
-import model.enums.ProfessionType;
-import model.enums.ResourceType;
-import model.enums.SpecialSkillType;
-import model.enums.TerrainType;
+import model.enums.*;
 import model.enums.cards.BeastType;
 import model.enums.cards.InventionType;
 import model.enums.cards.adventurecards.AdventureEventEffectType;
@@ -20,6 +17,7 @@ import model.enums.cards.wreckagecards.WreckageThreatEffectType;
 
 import java.util.*;
 
+import static model.enums.PhaseType.*;
 import static model.enums.ProfessionType.*;
 import static model.enums.ResourceType.FOOD;
 import static model.enums.ResourceType.WOOD;
@@ -63,6 +61,7 @@ public class Mappings {
     private static Map<Integer, Integer> islandTileIdToTotemsNumberMapping = new HashMap<>();
     private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
     private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
+    private static Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping = new HashMap<>();
 
     public Mappings() {
         eventEffectToEventIconMapping.put(WINTER_DEPRESSION, BOOK);
@@ -556,6 +555,23 @@ public class Mappings {
         islandTileIdToHasNaturalShelterMapping.put(9, false);
         islandTileIdToHasNaturalShelterMapping.put(10, false);
         islandTileIdToHasNaturalShelterMapping.put(11, true);
+
+        currentPhaseToNextPhaseMapping.put(null, EVENT_PHASE);
+        currentPhaseToNextPhaseMapping.put(EVENT_PHASE, MORALE_PHASE);
+        currentPhaseToNextPhaseMapping.put(MORALE_PHASE, PRODUCTION_PHASE);
+        currentPhaseToNextPhaseMapping.put(PRODUCTION_PHASE, ACTION_PHASE);
+        currentPhaseToNextPhaseMapping.put(ACTION_PHASE, WEATHER_PHASE);
+        currentPhaseToNextPhaseMapping.put(WEATHER_PHASE, NIGHT_PHASE);
+        currentPhaseToNextPhaseMapping.put(NIGHT_PHASE, EVENT_PHASE);
+
+    }
+
+    public static Map<PhaseType, PhaseType> getCurrentPhaseToNextPhaseMapping() {
+        return currentPhaseToNextPhaseMapping;
+    }
+
+    public static void setCurrentPhaseToNextPhaseMapping(Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping) {
+        Mappings.currentPhaseToNextPhaseMapping = currentPhaseToNextPhaseMapping;
     }
 
     public static Map<Integer, TerrainType> getIslandTileIdToTerrainMapping() {

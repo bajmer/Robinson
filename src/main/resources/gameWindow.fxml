@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.Pane?>
 <Pane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121">
+      minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141"
+      fx:controller="controller.GameWindowController">
     <children>
-        <Button layoutX="268.0" layoutY="185.0" mnemonicParsing="false" text="ekran2"/>
+        <Button fx:id="button" layoutX="268.0" layoutY="185.0" mnemonicParsing="false" onAction="#onAction"
+                text="ekran2"/>
     </children>
 </Pane>
