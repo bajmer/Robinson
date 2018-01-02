@@ -1,7 +1,9 @@
 package model;
 
 import model.enums.ProfessionType;
+import model.enums.ResourceType;
 import model.enums.SpecialSkillType;
+import model.enums.TerrainType;
 import model.enums.cards.BeastType;
 import model.enums.cards.InventionType;
 import model.enums.cards.adventurecards.AdventureEventEffectType;
@@ -19,7 +21,10 @@ import model.enums.cards.wreckagecards.WreckageThreatEffectType;
 import java.util.*;
 
 import static model.enums.ProfessionType.*;
+import static model.enums.ResourceType.FOOD;
+import static model.enums.ResourceType.WOOD;
 import static model.enums.SpecialSkillType.*;
+import static model.enums.TerrainType.*;
 import static model.enums.cards.BeastType.*;
 import static model.enums.cards.InventionType.*;
 import static model.enums.cards.adventurecards.AdventureEventEffectType.SOME_ADVENTURE_EVENT_EFFECT;
@@ -43,13 +48,21 @@ public class Mappings {
     private static Map<ExplorationAdventureType, AdventureEventEffectType> explorationAdventureToAdventureEventEffectMapping = new HashMap<>();
     private static Map<BeastType, List<Integer>> beastToBeastStatsMapping = new HashMap<>();
     private static Map<Integer, Integer> scenarioIdToRoundsNumberMapping = new HashMap<>();
-    private static Map<InventionType, Boolean> inventionTypeToIsMandatoryMapping = new HashMap<>();
+    private static Map<InventionType, Boolean> inventionToIsMandatoryMapping = new HashMap<>();
+    private static Map<InventionType, ProfessionType> inventionToOwnerMapping = new HashMap<>();
     private static Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping = new HashMap<>();
     private static Map<ProfessionType, InventionType> professionToPersonalInventionMapping = new HashMap<>();
     private static Map<ProfessionType, List<Integer>> professionToMoraleDownMapping = new HashMap<>();
     private static Map<ProfessionType, Integer> professionToLifeMapping = new HashMap<>();
     private static Map<WreckageEventEffectType, WreckageThreatActionType> wreckageEventToWreckageThreatActionMapping = new HashMap<>();
     private static Map<WreckageEventEffectType, WreckageThreatEffectType> wreckageEventToWreckageThreatEffectMapping = new HashMap<>();
+    private static Map<Integer, TerrainType> islandTileIdToTerrainMapping = new HashMap<>();
+    private static Map<Integer, ResourceType> islandTileIdToLeftSquareResourceMapping = new HashMap<>();
+    private static Map<Integer, ResourceType> islandTileIdToRightSquareResourceMapping = new HashMap<>();
+    private static Map<Integer, Boolean> islandTileIdToHasAnimalSourceMapping = new HashMap<>();
+    private static Map<Integer, Integer> islandTileIdToTotemsNumberMapping = new HashMap<>();
+    private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
+    private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
 
     public Mappings() {
         eventEffectToEventIconMapping.put(WINTER_DEPRESSION, BOOK);
@@ -392,41 +405,42 @@ public class Mappings {
         scenarioIdToRoundsNumberMapping.put(6, 12);
         scenarioIdToRoundsNumberMapping.put(7, 12);
 
-        inventionTypeToIsMandatoryMapping.put(BOW, true);
-        inventionTypeToIsMandatoryMapping.put(BRICKS, true);
-        inventionTypeToIsMandatoryMapping.put(DAM, true);
-        inventionTypeToIsMandatoryMapping.put(InventionType.FIRE, true);
-        inventionTypeToIsMandatoryMapping.put(KNIFE, true);
-        inventionTypeToIsMandatoryMapping.put(MAP, true);
-        inventionTypeToIsMandatoryMapping.put(POT, true);
-        inventionTypeToIsMandatoryMapping.put(ROPE, true);
-        inventionTypeToIsMandatoryMapping.put(SHOVEL, true);
-        inventionTypeToIsMandatoryMapping.put(BASKET, false);
-        inventionTypeToIsMandatoryMapping.put(BED, false);
-        inventionTypeToIsMandatoryMapping.put(BELTS, false);
-        inventionTypeToIsMandatoryMapping.put(CELLAR, false);
-        inventionTypeToIsMandatoryMapping.put(CORRAL, false);
-        inventionTypeToIsMandatoryMapping.put(CURE, false);
-        inventionTypeToIsMandatoryMapping.put(DIARY, false);
-        inventionTypeToIsMandatoryMapping.put(DRUMS, false);
-        inventionTypeToIsMandatoryMapping.put(FIREPLACE, false);
-        inventionTypeToIsMandatoryMapping.put(FURNACE, false);
-        inventionTypeToIsMandatoryMapping.put(LANTERN, false);
-        inventionTypeToIsMandatoryMapping.put(MOAT, false);
-        inventionTypeToIsMandatoryMapping.put(PIT, false);
-        inventionTypeToIsMandatoryMapping.put(RAFT, false);
-        inventionTypeToIsMandatoryMapping.put(SACK, false);
-        inventionTypeToIsMandatoryMapping.put(SHIELD, false);
-        inventionTypeToIsMandatoryMapping.put(SHORTCUT, false);
-        inventionTypeToIsMandatoryMapping.put(SLING, false);
-        inventionTypeToIsMandatoryMapping.put(SNARE, false);
-        inventionTypeToIsMandatoryMapping.put(SPEAR, false);
-        inventionTypeToIsMandatoryMapping.put(WALL, false);
+        inventionToIsMandatoryMapping.put(BOW, true);
+        inventionToIsMandatoryMapping.put(BRICKS, true);
+        inventionToIsMandatoryMapping.put(DAM, true);
+        inventionToIsMandatoryMapping.put(InventionType.FIRE, true);
+        inventionToIsMandatoryMapping.put(KNIFE, true);
+        inventionToIsMandatoryMapping.put(MAP, true);
+        inventionToIsMandatoryMapping.put(POT, true);
+        inventionToIsMandatoryMapping.put(ROPE, true);
+        inventionToIsMandatoryMapping.put(SHOVEL, true);
+        inventionToIsMandatoryMapping.put(BASKET, false);
+        inventionToIsMandatoryMapping.put(BED, false);
+        inventionToIsMandatoryMapping.put(BELTS, false);
+        inventionToIsMandatoryMapping.put(CELLAR, false);
+        inventionToIsMandatoryMapping.put(CORRAL, false);
+        inventionToIsMandatoryMapping.put(CURE, false);
+        inventionToIsMandatoryMapping.put(DIARY, false);
+        inventionToIsMandatoryMapping.put(DRUMS, false);
+        inventionToIsMandatoryMapping.put(FIREPLACE, false);
+        inventionToIsMandatoryMapping.put(FURNACE, false);
+        inventionToIsMandatoryMapping.put(LANTERN, false);
+        inventionToIsMandatoryMapping.put(MOAT, false);
+        inventionToIsMandatoryMapping.put(PIT, false);
+        inventionToIsMandatoryMapping.put(RAFT, false);
+        inventionToIsMandatoryMapping.put(SACK, false);
+        inventionToIsMandatoryMapping.put(SHIELD, false);
+        inventionToIsMandatoryMapping.put(SHORTCUT, false);
+        inventionToIsMandatoryMapping.put(SLING, false);
+        inventionToIsMandatoryMapping.put(SNARE, false);
+        inventionToIsMandatoryMapping.put(SPEAR, false);
+        inventionToIsMandatoryMapping.put(WALL, false);
 
-        professionToPersonalInventionMapping.put(CARPENTER, SNARE);
-        professionToPersonalInventionMapping.put(COOK, FIREPLACE);
-        professionToPersonalInventionMapping.put(EXPLORER, SHORTCUT);
-        professionToPersonalInventionMapping.put(SOLDIER, SPEAR);
+        inventionToOwnerMapping.put(SNARE, CARPENTER);
+        inventionToOwnerMapping.put(FIREPLACE, COOK);
+        inventionToOwnerMapping.put(SHORTCUT, EXPLORER);
+        inventionToOwnerMapping.put(SPEAR, SOLDIER);
+
 
         professionToSpecialSkillMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(
                 ECONOMICAL_CONSTRUCTION, CRAFT, NEW_IDEA, HANDYMAN)));
@@ -436,6 +450,11 @@ public class Mappings {
                 LUCKY_MAN, RECONNAISSANCE, MOTIVATIONAL_SPEECH, SCOUT)));
         professionToSpecialSkillMapping.put(SOLDIER, new ArrayList<>(Arrays.asList(
                 TRACKING, HOUNTING, FURY, EMERGENCY_PLAN)));
+
+        professionToPersonalInventionMapping.put(CARPENTER, SNARE);
+        professionToPersonalInventionMapping.put(COOK, FIREPLACE);
+        professionToPersonalInventionMapping.put(EXPLORER, SHORTCUT);
+        professionToPersonalInventionMapping.put(SOLDIER, SPEAR);
 
         professionToMoraleDownMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(8, 5, 3)));
         professionToMoraleDownMapping.put(COOK, new ArrayList<>(Arrays.asList(9, 6, 4, 2)));
@@ -454,6 +473,153 @@ public class Mappings {
         wreckageEventToWreckageThreatEffectMapping.put(FOOD_CRATES, SOME_WRECKAGE_THREAT_EFFECT);
         wreckageEventToWreckageThreatEffectMapping.put(CAPTAINS_CHEST, SOME_WRECKAGE_THREAT_EFFECT);
         wreckageEventToWreckageThreatEffectMapping.put(WRECKED_LIFEBOAT, SOME_WRECKAGE_THREAT_EFFECT);
+
+        islandTileIdToTerrainMapping.put(1, PLAINS);
+        islandTileIdToTerrainMapping.put(2, MOUNTAINS);
+        islandTileIdToTerrainMapping.put(3, RIVER);
+        islandTileIdToTerrainMapping.put(4, HILLS);
+        islandTileIdToTerrainMapping.put(5, MOUNTAINS);
+        islandTileIdToTerrainMapping.put(6, PLAINS);
+        islandTileIdToTerrainMapping.put(7, HILLS);
+        islandTileIdToTerrainMapping.put(8, BEACH);
+        islandTileIdToTerrainMapping.put(9, PLAINS);
+        islandTileIdToTerrainMapping.put(10, RIVER);
+        islandTileIdToTerrainMapping.put(11, MOUNTAINS);
+
+        islandTileIdToLeftSquareResourceMapping.put(1, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(1, null);
+        islandTileIdToLeftSquareResourceMapping.put(2, FOOD);
+        islandTileIdToRightSquareResourceMapping.put(2, null);
+        islandTileIdToLeftSquareResourceMapping.put(3, null);
+        islandTileIdToRightSquareResourceMapping.put(3, FOOD);
+        islandTileIdToLeftSquareResourceMapping.put(4, FOOD);
+        islandTileIdToRightSquareResourceMapping.put(4, WOOD);
+        islandTileIdToLeftSquareResourceMapping.put(5, FOOD);
+        islandTileIdToRightSquareResourceMapping.put(5, WOOD);
+        islandTileIdToLeftSquareResourceMapping.put(6, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(6, FOOD);
+        islandTileIdToLeftSquareResourceMapping.put(7, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(7, null);
+        islandTileIdToLeftSquareResourceMapping.put(8, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(8, FOOD);
+        islandTileIdToLeftSquareResourceMapping.put(9, FOOD);
+        islandTileIdToRightSquareResourceMapping.put(9, null);
+        islandTileIdToLeftSquareResourceMapping.put(10, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(10, FOOD);
+        islandTileIdToLeftSquareResourceMapping.put(11, WOOD);
+        islandTileIdToRightSquareResourceMapping.put(11, null);
+
+        islandTileIdToHasAnimalSourceMapping.put(1, true);
+        islandTileIdToHasAnimalSourceMapping.put(2, true);
+        islandTileIdToHasAnimalSourceMapping.put(3, true);
+        islandTileIdToHasAnimalSourceMapping.put(4, false);
+        islandTileIdToHasAnimalSourceMapping.put(5, false);
+        islandTileIdToHasAnimalSourceMapping.put(6, false);
+        islandTileIdToHasAnimalSourceMapping.put(7, true);
+        islandTileIdToHasAnimalSourceMapping.put(8, false);
+        islandTileIdToHasAnimalSourceMapping.put(9, true);
+        islandTileIdToHasAnimalSourceMapping.put(10, false);
+        islandTileIdToHasAnimalSourceMapping.put(11, true);
+
+        islandTileIdToTotemsNumberMapping.put(1, 0);
+        islandTileIdToTotemsNumberMapping.put(2, 1);
+        islandTileIdToTotemsNumberMapping.put(3, 0);
+        islandTileIdToTotemsNumberMapping.put(4, 1);
+        islandTileIdToTotemsNumberMapping.put(5, 1);
+        islandTileIdToTotemsNumberMapping.put(6, 1);
+        islandTileIdToTotemsNumberMapping.put(7, 1);
+        islandTileIdToTotemsNumberMapping.put(8, 0);
+        islandTileIdToTotemsNumberMapping.put(9, 0);
+        islandTileIdToTotemsNumberMapping.put(10, 1);
+        islandTileIdToTotemsNumberMapping.put(11, 0);
+
+        islandTileIdToDiscoveryTokensNumberMapping.put(1, 2);
+        islandTileIdToDiscoveryTokensNumberMapping.put(2, 1);
+        islandTileIdToDiscoveryTokensNumberMapping.put(3, 3);
+        islandTileIdToDiscoveryTokensNumberMapping.put(4, 2);
+        islandTileIdToDiscoveryTokensNumberMapping.put(5, 1);
+        islandTileIdToDiscoveryTokensNumberMapping.put(6, 1);
+        islandTileIdToDiscoveryTokensNumberMapping.put(7, 2);
+        islandTileIdToDiscoveryTokensNumberMapping.put(8, 0);
+        islandTileIdToDiscoveryTokensNumberMapping.put(9, 3);
+        islandTileIdToDiscoveryTokensNumberMapping.put(10, 1);
+        islandTileIdToDiscoveryTokensNumberMapping.put(11, 1);
+
+        islandTileIdToHasNaturalShelterMapping.put(1, false);
+        islandTileIdToHasNaturalShelterMapping.put(2, true);
+        islandTileIdToHasNaturalShelterMapping.put(3, false);
+        islandTileIdToHasNaturalShelterMapping.put(4, false);
+        islandTileIdToHasNaturalShelterMapping.put(5, false);
+        islandTileIdToHasNaturalShelterMapping.put(6, false);
+        islandTileIdToHasNaturalShelterMapping.put(7, false);
+        islandTileIdToHasNaturalShelterMapping.put(8, false);
+        islandTileIdToHasNaturalShelterMapping.put(9, false);
+        islandTileIdToHasNaturalShelterMapping.put(10, false);
+        islandTileIdToHasNaturalShelterMapping.put(11, true);
+    }
+
+    public static Map<Integer, TerrainType> getIslandTileIdToTerrainMapping() {
+        return islandTileIdToTerrainMapping;
+    }
+
+    public static void setIslandTileIdToTerrainMapping(Map<Integer, TerrainType> islandTileIdToTerrainMapping) {
+        Mappings.islandTileIdToTerrainMapping = islandTileIdToTerrainMapping;
+    }
+
+    public static Map<Integer, Boolean> getIslandTileIdToHasAnimalSourceMapping() {
+        return islandTileIdToHasAnimalSourceMapping;
+    }
+
+    public static void setIslandTileIdToHasAnimalSourceMapping(Map<Integer, Boolean> islandTileIdToHasAnimalSourceMapping) {
+        Mappings.islandTileIdToHasAnimalSourceMapping = islandTileIdToHasAnimalSourceMapping;
+    }
+
+    public static Map<Integer, Integer> getIslandTileIdToTotemsNumberMapping() {
+        return islandTileIdToTotemsNumberMapping;
+    }
+
+    public static void setIslandTileIdToTotemsNumberMapping(Map<Integer, Integer> islandTileIdToTotemsNumberMapping) {
+        Mappings.islandTileIdToTotemsNumberMapping = islandTileIdToTotemsNumberMapping;
+    }
+
+    public static Map<Integer, Integer> getIslandTileIdToDiscoveryTokensNumberMapping() {
+        return islandTileIdToDiscoveryTokensNumberMapping;
+    }
+
+    public static void setIslandTileIdToDiscoveryTokensNumberMapping(Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping) {
+        Mappings.islandTileIdToDiscoveryTokensNumberMapping = islandTileIdToDiscoveryTokensNumberMapping;
+    }
+
+    public static Map<Integer, Boolean> getIslandTileIdToHasNaturalShelterMapping() {
+        return islandTileIdToHasNaturalShelterMapping;
+    }
+
+    public static void setIslandTileIdToHasNaturalShelterMapping(Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping) {
+        Mappings.islandTileIdToHasNaturalShelterMapping = islandTileIdToHasNaturalShelterMapping;
+    }
+
+    public static Map<Integer, ResourceType> getIslandTileIdToLeftSquareResourceMapping() {
+        return islandTileIdToLeftSquareResourceMapping;
+    }
+
+    public static void setIslandTileIdToLeftSquareResourceMapping(Map<Integer, ResourceType> islandTileIdToLeftSquareResourceMapping) {
+        Mappings.islandTileIdToLeftSquareResourceMapping = islandTileIdToLeftSquareResourceMapping;
+    }
+
+    public static Map<Integer, ResourceType> getIslandTileIdToRightSquareResourceMapping() {
+        return islandTileIdToRightSquareResourceMapping;
+    }
+
+    public static void setIslandTileIdToRightSquareResourceMapping(Map<Integer, ResourceType> islandTileIdToRightSquareResourceMapping) {
+        Mappings.islandTileIdToRightSquareResourceMapping = islandTileIdToRightSquareResourceMapping;
+    }
+
+    public static Map<ProfessionType, InventionType> getProfessionToPersonalInventionMapping() {
+        return professionToPersonalInventionMapping;
+    }
+
+    public static void setProfessionToPersonalInventionMapping(Map<ProfessionType, InventionType> professionToPersonalInventionMapping) {
+        Mappings.professionToPersonalInventionMapping = professionToPersonalInventionMapping;
     }
 
     public static Map<WreckageEventEffectType, WreckageThreatActionType> getWreckageEventToWreckageThreatActionMapping() {
@@ -488,12 +654,12 @@ public class Mappings {
         Mappings.professionToMoraleDownMapping = professionToMoraleDownMapping;
     }
 
-    public static Map<ProfessionType, InventionType> getProfessionToPersonalInventionMapping() {
-        return professionToPersonalInventionMapping;
+    public static Map<InventionType, ProfessionType> getInventionToOwnerMapping() {
+        return inventionToOwnerMapping;
     }
 
-    public static void setProfessionToPersonalInventionMapping(Map<ProfessionType, InventionType> professionToPersonalInventionMapping) {
-        Mappings.professionToPersonalInventionMapping = professionToPersonalInventionMapping;
+    public static void setInventionToOwnerMapping(Map<InventionType, ProfessionType> inventionToOwnerMapping) {
+        Mappings.inventionToOwnerMapping = inventionToOwnerMapping;
     }
 
     public static Map<ProfessionType, List<SpecialSkillType>> getProfessionToSpecialSkillMapping() {
@@ -504,12 +670,12 @@ public class Mappings {
         Mappings.professionToSpecialSkillMapping = professionToSpecialSkillMapping;
     }
 
-    public static Map<InventionType, Boolean> getInventionTypeToIsMandatoryMapping() {
-        return inventionTypeToIsMandatoryMapping;
+    public static Map<InventionType, Boolean> getInventionToIsMandatoryMapping() {
+        return inventionToIsMandatoryMapping;
     }
 
-    public static void setInventionTypeToIsMandatoryMapping(Map<InventionType, Boolean> inventionTypeToIsMandatoryMapping) {
-        Mappings.inventionTypeToIsMandatoryMapping = inventionTypeToIsMandatoryMapping;
+    public static void setInventionToIsMandatoryMapping(Map<InventionType, Boolean> inventionToIsMandatoryMapping) {
+        Mappings.inventionToIsMandatoryMapping = inventionToIsMandatoryMapping;
     }
 
     public static Map<Integer, Integer> getScenarioIdToRoundsNumberMapping() {

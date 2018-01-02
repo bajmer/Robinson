@@ -1,23 +1,24 @@
 package model.cards;
 
+import model.enums.ResourceType;
 import model.enums.TerrainType;
 
 public class IslandTile implements Usable {
     private int id;
     private TerrainType terrainType;
-    private boolean hasWoodSource;
-    private boolean hasFoodSource;
     private boolean hasAnimalSoure;
     private int totemsNumber;
     private int discoveryTokensNumber;
     private boolean hasNaturalShelter;
+    private ResourceType leftSquareResource;
+    private ResourceType rightSquareResource;
 
-    public IslandTile(int id, TerrainType terrainType, boolean hasWoodSource, boolean hasFoodSource, boolean hasAnimalSoure, int totemsNumber, int discoveryTokensNumber, boolean hasNaturalShelter) {
+    public IslandTile(int id, TerrainType terrainType, ResourceType leftSquareResource, ResourceType rightSquareResource, boolean hasAnimalSource, int totemsNumber, int discoveryTokensNumber, boolean hasNaturalShelter) {
         this.id = id;
         this.terrainType = terrainType;
-        this.hasWoodSource = hasWoodSource;
-        this.hasFoodSource = hasFoodSource;
-        this.hasAnimalSoure = hasAnimalSoure;
+        this.leftSquareResource = leftSquareResource;
+        this.rightSquareResource = rightSquareResource;
+        this.hasAnimalSoure = hasAnimalSource;
         this.totemsNumber = totemsNumber;
         this.discoveryTokensNumber = discoveryTokensNumber;
         this.hasNaturalShelter = hasNaturalShelter;
@@ -37,22 +38,6 @@ public class IslandTile implements Usable {
 
     public void setTerrainType(TerrainType terrainType) {
         this.terrainType = terrainType;
-    }
-
-    public boolean isHasWoodSource() {
-        return hasWoodSource;
-    }
-
-    public void setHasWoodSource(boolean hasWoodSource) {
-        this.hasWoodSource = hasWoodSource;
-    }
-
-    public boolean isHasFoodSource() {
-        return hasFoodSource;
-    }
-
-    public void setHasFoodSource(boolean hasFoodSource) {
-        this.hasFoodSource = hasFoodSource;
     }
 
     public boolean isHasAnimalSoure() {
