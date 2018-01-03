@@ -8,7 +8,7 @@ public class Scenario implements IScenario {
     public Scenario(int id, int roundsNumber) {
         this.id = id;
         this.roundsNumber = roundsNumber;
-        this.round = 1;
+        this.round = 0;
     }
 
     public int getId() {

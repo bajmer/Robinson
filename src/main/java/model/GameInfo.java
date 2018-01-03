@@ -14,6 +14,7 @@ public class GameInfo {
     private CharactersStats charactersStats;
     private Resources avaibleResources;
     private Resources futureResources;
+    private Character firstPlayer;
 
     public GameInfo() {
         this.characters = new ArrayList<>();
@@ -23,6 +24,14 @@ public class GameInfo {
         charactersStats = new CharactersStats();
         avaibleResources = new Resources();
         futureResources = new Resources();
+    }
+
+    public Character getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public void setFirstPlayer(Character firstPlayer) {
+        this.firstPlayer = firstPlayer;
     }
 
     public List<Character> getCharacters() {

@@ -277,8 +277,92 @@ public class GameEngineController {
     }
 
     public void nextPhase() {
-        logger.info("Faza: " + phase);
         phase = Mappings.getCurrentPhaseToNextPhaseMapping().get(phase);
-        logger.info("Faza: " + phase);
+        if (phase == PhaseType.EVENT_PHASE) {
+            updateGameParams();
+        }
+
+        logger.info("Obecna faza: " + phase);
+        runPhase();
     }
+
+    private void updateFirstPlayer() {
+        int firstPlayerId = (scenario.getRound() - 1) % gameInfo.getCharacters().size();
+        gameInfo.setFirstPlayer(gameInfo.getCharacters().get(firstPlayerId));
+    }
+
+    private void runPhase() {
+        switch (phase) {
+            case EVENT_PHASE:
+                handleEventPhase();
+                break;
+            case MORALE_PHASE:
+                handleMoralePhase();
+                break;
+            case PRODUCTION_PHASE:
+                handleProductionPhase();
+                break;
+            case ACTION_PHASE:
+                handleActionPhase();
+                break;
+            case WEATHER_PHASE:
+                handleWeatherPhase();
+                break;
+            case NIGHT_PHASE:
+                handleNightPhase();
+                break;
+        }
+    }
+
+    private void handleEventPhase() {
+        Usable card = eventStack.getStack().removeFirst();
+        card.use();
+//        logger.info(card.getEventEffect());
+    }
+
+    private void handleMoralePhase() {
+        int morale = gameInfo.getCharactersStats().getMoraleLevel();
+        Character firstPlayer = gameInfo.getFirstPlayer();
+        int determination = firstPlayer.getDetermination();
+        int life = firstPlayer.getLife();
+
+        if (determination + morale < 0) {
+            firstPlayer.setLife(life + determination + morale);
+            firstPlayer.setDetermination(0);
+        }
+    }
+
+    private void handleProductionPhase() {
+
+    }
+
+    private void handleActionPhase() {
+
+    }
+
+    private void handleWeatherPhase() {
+
+    }
+
+    private void handleNightPhase() {
+
+    }
+
+    private void handleGameEnd() {
+        logger.info("Koniec gry!");
+    }
+
+    private void updateGameParams() {
+        boolean isGameEnd = scenario.nextRound();
+        if (isGameEnd) {
+            handleGameEnd();
+        }
+        logger.info("***********************************************************");
+        logger.info("Runda numer: " + scenario.getRound());
+
+        updateFirstPlayer();
+        logger.info("Pierwszy gracz: " + gameInfo.getFirstPlayer().getProfession());
+    }
+
+
 }
