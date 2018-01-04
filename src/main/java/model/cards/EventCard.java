@@ -52,7 +52,7 @@ public class EventCard implements Usable {
 
     @Override
     public void use() {
-        System.out.println("To jest karta wydarzenia!");
+        System.out.println("Karta wydarzenia: " + eventEffect);
     }
 
     @Override

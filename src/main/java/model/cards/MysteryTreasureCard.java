@@ -9,6 +9,14 @@ public class MysteryTreasureCard implements Usable {
         this.treasureType = treasureType;
     }
 
+    public MysteryTreasureType getTreasureType() {
+        return treasureType;
+    }
+
+    public void setTreasureType(MysteryTreasureType treasureType) {
+        this.treasureType = treasureType;
+    }
+
     @Override
     public void use() {
 

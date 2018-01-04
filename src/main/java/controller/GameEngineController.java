@@ -5,6 +5,7 @@ import model.Character;
 import model.cards.*;
 import model.enums.PhaseType;
 import model.enums.ProfessionType;
+import model.enums.ResourceType;
 import model.enums.SexType;
 import model.enums.cards.BeastType;
 import model.enums.cards.DiscoveryTokenType;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameEngineController {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
@@ -267,6 +269,7 @@ public class GameEngineController {
             if (i != 8) {
                 islandTilesStack.getStack().add(islandTile);
             } else {
+                gameInfo.getDiscoveredTiles().add(islandTile);
                 board.getTilePositionIdToIslandTile().put(1, islandTile);
             }
         }
@@ -321,7 +324,7 @@ public class GameEngineController {
     }
 
     private void handleMoralePhase() {
-        int morale = gameInfo.getCharactersStats().getMoraleLevel();
+        int morale = gameInfo.getMoraleLevel();
         Character firstPlayer = gameInfo.getFirstPlayer();
         int determination = firstPlayer.getDetermination();
         int life = firstPlayer.getLife();
@@ -330,10 +333,25 @@ public class GameEngineController {
             firstPlayer.setLife(life + determination + morale);
             firstPlayer.setDetermination(0);
         }
+
+        if (firstPlayer.getLife() <= 0) {
+            handleGameEnd();
+        }
     }
 
     private void handleProductionPhase() {
+        IslandTile camp = gameInfo.getCamp();
+        int tmpWood = gameInfo.getAvaibleResources().getWoodAmount();
+        int woodProduction = gameInfo.getProductionWoodNumber();
+        int tmpFood = gameInfo.getAvaibleResources().getFoodAmount();
+        int foodProduction = gameInfo.getProductionFoodNumber();
 
+        if (camp.getLeftSquareResource() == ResourceType.WOOD || camp.getRightSquareResource() == ResourceType.WOOD) {
+            gameInfo.getAvaibleResources().setWoodAmount(tmpWood + woodProduction);
+        }
+        if (camp.getLeftSquareResource() == ResourceType.FOOD || camp.getRightSquareResource() == ResourceType.FOOD) {
+            gameInfo.getAvaibleResources().setFoodAmount(tmpFood + foodProduction);
+        }
     }
 
     private void handleActionPhase() {
@@ -345,7 +363,42 @@ public class GameEngineController {
     }
 
     private void handleNightPhase() {
+        int requiredFood = gameInfo.getCharacters().size();
+        int foodAmount = gameInfo.getAvaibleResources().getFoodAmount();
+        int longExpiryDateFoodAmount = gameInfo.getAvaibleResources().getLongExpiryDateFoodsAmount();
+        int allFoodAmount = foodAmount + longExpiryDateFoodAmount;
 
+        if (allFoodAmount < requiredFood) {
+            //wybór postaci, która nie zje
+        } else {
+            gameInfo.getAvaibleResources().setFoodAmount(foodAmount - requiredFood);
+            int foodAmountAfterEat = gameInfo.getAvaibleResources().getFoodAmount();
+            if (foodAmountAfterEat < 0) {
+                gameInfo.getAvaibleResources().setLongExpiryDateFoodsAmount(longExpiryDateFoodAmount + foodAmountAfterEat);
+                gameInfo.getAvaibleResources().setFoodAmount(0);
+            }
+        }
+
+        //opcja przeniesienia obozu
+
+        IslandTile camp = gameInfo.getCamp();
+        if (!gameInfo.isShelter() && !camp.isHasNaturalShelter()) {
+            gameInfo.getCharacters().forEach(character -> character.setLife(character.getLife() - 1));
+        }
+
+        AtomicBoolean canStorageFood = new AtomicBoolean(false);
+        gameInfo.getInventions().forEach(inventionCard -> {
+            if (inventionCard.getInvention() == InventionType.CELLAR) canStorageFood.set(true);
+        });
+
+        gameInfo.getTreasures().forEach(mysteryTreasureCard -> {
+            if (mysteryTreasureCard.getTreasureType() == MysteryTreasureType.BARREL
+                /*|| mysteryTreasureCard.getTreasureType() == skrzynie*/) canStorageFood.set(true);
+        });
+
+        if (!canStorageFood.get()) {
+            gameInfo.getAvaibleResources().setFoodAmount(0);
+        }
     }
 
     private void handleGameEnd() {

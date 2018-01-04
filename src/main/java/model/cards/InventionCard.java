@@ -1,6 +1,7 @@
 package model.cards;
 
 import model.enums.ProfessionType;
+import model.enums.TerrainType;
 import model.enums.cards.InventionType;
 
 public class InventionCard implements Usable {
@@ -8,6 +9,10 @@ public class InventionCard implements Usable {
     private boolean isMandatory;
     private boolean isIdea;
     private ProfessionType owner;
+    private TerrainType requiredTerrain;
+    private InventionCard requiredItem;
+    private int requiredWoods;
+    private int requiredHides;
 
     public InventionCard(InventionType invention, boolean isMandatory, ProfessionType owner) {
         this.invention = invention;

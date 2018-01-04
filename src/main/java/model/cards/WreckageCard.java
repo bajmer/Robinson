@@ -17,7 +17,7 @@ public class WreckageCard implements Usable {
 
     @Override
     public void use() {
-        System.out.println("To jest karta wraku!");
+        System.out.println("Karta wraku: " + wreckageEventEffect);
     }
 
     @Override

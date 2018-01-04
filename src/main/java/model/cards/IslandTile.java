@@ -6,7 +6,7 @@ import model.enums.TerrainType;
 public class IslandTile implements Usable {
     private int id;
     private TerrainType terrainType;
-    private boolean hasAnimalSoure;
+    private boolean hasAnimalSource;
     private int totemsNumber;
     private int discoveryTokensNumber;
     private boolean hasNaturalShelter;
@@ -18,10 +18,26 @@ public class IslandTile implements Usable {
         this.terrainType = terrainType;
         this.leftSquareResource = leftSquareResource;
         this.rightSquareResource = rightSquareResource;
-        this.hasAnimalSoure = hasAnimalSource;
+        this.hasAnimalSource = hasAnimalSource;
         this.totemsNumber = totemsNumber;
         this.discoveryTokensNumber = discoveryTokensNumber;
         this.hasNaturalShelter = hasNaturalShelter;
+    }
+
+    public ResourceType getLeftSquareResource() {
+        return leftSquareResource;
+    }
+
+    public void setLeftSquareResource(ResourceType leftSquareResource) {
+        this.leftSquareResource = leftSquareResource;
+    }
+
+    public ResourceType getRightSquareResource() {
+        return rightSquareResource;
+    }
+
+    public void setRightSquareResource(ResourceType rightSquareResource) {
+        this.rightSquareResource = rightSquareResource;
     }
 
     public int getId() {
@@ -40,12 +56,12 @@ public class IslandTile implements Usable {
         this.terrainType = terrainType;
     }
 
-    public boolean isHasAnimalSoure() {
-        return hasAnimalSoure;
+    public boolean isHasAnimalSource() {
+        return hasAnimalSource;
     }
 
-    public void setHasAnimalSoure(boolean hasAnimalSoure) {
-        this.hasAnimalSoure = hasAnimalSoure;
+    public void setHasAnimalSource(boolean hasAnimalSource) {
+        this.hasAnimalSource = hasAnimalSource;
     }
 
     public int getTotemsNumber() {
