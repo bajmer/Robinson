@@ -22,6 +22,7 @@ public class GameWindowController {
         Map<ProfessionType, SexType> choosedCharacters = new HashMap<>();
         choosedCharacters.put(ProfessionType.CARPENTER, SexType.MAN);
         choosedCharacters.put(ProfessionType.COOK, SexType.WOMAN);
+        choosedCharacters.put(ProfessionType.EXPLORER, SexType.MAN);
         boolean isFriday = true;
         boolean isDog = true;
         WreckageEventEffectType wreckageEvent = WreckageEventEffectType.FOOD_CRATES;

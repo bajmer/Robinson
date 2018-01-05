@@ -96,38 +96,27 @@ public class Character implements ICharacter {
 
     }
 
-    public int checkIfMoraleDownAndDecrease(int lifesNumber) {
-        int moraleDownCounter = 0;
-        for (int i = this.life + lifesNumber; i >= this.life; i--) {
-            for (Integer j : this.moraleDown) {
-                if (i == j) {
-                    moraleDownCounter++;
+    public void changeLife(int lives) {
+        if (lives < 0) {
+            for (int i = life; i >= life + lives; i--) {
+                if (moraleDown.contains(i)) {
+                    GameInfo.changeMoraleLevel(-1);
                 }
             }
         }
-        return moraleDownCounter;
+        life += lives;
     }
 
-    public void increaseLife(int lifesNumber) {
-        this.life += lifesNumber;
-    }
-
-    public void decreaseLife(int lifesNumber) {
-        this.life -= lifesNumber;
-    }
-
-    public void increaseDetermination(int determinationsNumber) {
-        this.determination += determinationsNumber;
-    }
-
-    public void decreaseDetermination(int determinationsNumber) {
-        this.determination -= determinationsNumber;
-        if (this.determination < 0) {
-            decreaseLife(0 - this.determination);
+    @Override
+    public void changeDetermination(int determinations) {
+        determination += determinations;
+        if (determination < 0) {
+            changeLife(determination);
+            determination = 0;
         }
     }
 
-    public boolean checkIfDead() {
-        return this.life < 1;
+    public boolean isDead() {
+        return life < 1;
     }
 }

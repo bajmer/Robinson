@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameInfo {
+    private static int moraleLevel;
     private List<Character> characters;
     private List<InventionCard> ideas;
     private List<InventionCard> inventions;
@@ -20,13 +21,11 @@ public class GameInfo {
     private Character firstPlayer;
     private IslandTile camp;
     private boolean isShelter;
-    private int moraleLevel;
     private int roofLevel;
     private int palisadeLevel;
     private int weaponLevel;
     private int productionFoodNumber;
     private int productionWoodNumber;
-
     public GameInfo() {
         characters = new ArrayList<>();
         ideas = new ArrayList<>();
@@ -43,6 +42,20 @@ public class GameInfo {
         weaponLevel = 0;
         productionFoodNumber = 1;
         productionWoodNumber = 1;
+    }
+
+    public static int getMoraleLevel() {
+        return moraleLevel;
+    }
+
+    public static void setMoraleLevel(int moraleLevel) {
+        GameInfo.moraleLevel = moraleLevel;
+    }
+
+    public static void changeMoraleLevel(int moraleChange) {
+        moraleLevel += moraleChange;
+        if (moraleLevel > 3) moraleLevel = 3;
+        else if (moraleLevel < -3) moraleLevel = -3;
     }
 
     public List<MysteryTreasureCard> getTreasures() {
@@ -99,14 +112,6 @@ public class GameInfo {
 
     public void setShelter(boolean shelter) {
         isShelter = shelter;
-    }
-
-    public int getMoraleLevel() {
-        return moraleLevel;
-    }
-
-    public void setMoraleLevel(int moraleLevel) {
-        this.moraleLevel = moraleLevel;
     }
 
     public int getRoofLevel() {

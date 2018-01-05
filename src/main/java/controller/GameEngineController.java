@@ -1,8 +1,11 @@
 package controller;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import model.*;
 import model.Character;
 import model.cards.*;
+import model.cards.Stack;
 import model.enums.PhaseType;
 import model.enums.ProfessionType;
 import model.enums.ResourceType;
@@ -23,10 +26,7 @@ import model.enums.cards.wreckagecards.WreckageEventEffectType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameEngineController {
@@ -271,6 +271,7 @@ public class GameEngineController {
             } else {
                 gameInfo.getDiscoveredTiles().add(islandTile);
                 board.getTilePositionIdToIslandTile().put(1, islandTile);
+                gameInfo.setCamp(islandTile);
             }
         }
 
@@ -324,17 +325,16 @@ public class GameEngineController {
     }
 
     private void handleMoralePhase() {
-        int morale = gameInfo.getMoraleLevel();
+        int morale = GameInfo.getMoraleLevel();
+        logger.info("Poziom morale: " + morale);
         Character firstPlayer = gameInfo.getFirstPlayer();
         int determination = firstPlayer.getDetermination();
-        int life = firstPlayer.getLife();
 
-        if (determination + morale < 0) {
-            firstPlayer.setLife(life + determination + morale);
-            firstPlayer.setDetermination(0);
-        }
+        firstPlayer.changeDetermination(morale);
+        logger.info("Liczba żyć pierwszego gracza: " + firstPlayer.getLife());
+        logger.info("Liczba żetonów determinacji pierwszego gracza: " + firstPlayer.getDetermination());
 
-        if (firstPlayer.getLife() <= 0) {
+        if (firstPlayer.isDead()) {
             handleGameEnd();
         }
     }
@@ -370,6 +370,40 @@ public class GameEngineController {
 
         if (allFoodAmount < requiredFood) {
             //wybór postaci, która nie zje
+            List<ProfessionType> possibleCharacters = new ArrayList<>();
+            List<ProfessionType> hungryCharacters = new ArrayList<>();
+            gameInfo.getCharacters().forEach(character -> possibleCharacters.add(character.getProfession()));
+
+            for (int i = 0; i < requiredFood - allFoodAmount; i++) {
+                String result = askForHungryCharacter(possibleCharacters);
+                if (result.equals(ProfessionType.CARPENTER.toString())) {
+                    logger.info("Głoduje cieśla!");
+                    possibleCharacters.remove(ProfessionType.CARPENTER);
+                    hungryCharacters.add(ProfessionType.CARPENTER);
+                } else if (result.equals(ProfessionType.COOK.toString())) {
+                    logger.info("Głoduje kucharz!");
+                    possibleCharacters.remove(ProfessionType.COOK);
+                    hungryCharacters.add(ProfessionType.COOK);
+                } else if (result.equals(ProfessionType.EXPLORER.toString())) {
+                    logger.info("Głoduje odkrywca!");
+                    possibleCharacters.remove(ProfessionType.EXPLORER);
+                    hungryCharacters.add(ProfessionType.EXPLORER);
+                } else if (result.equals(ProfessionType.SOLDIER.toString())) {
+                    logger.info("Głoduje żołnierz!");
+                    possibleCharacters.remove(ProfessionType.SOLDIER);
+                    hungryCharacters.add(ProfessionType.SOLDIER);
+                }
+            }
+
+            gameInfo.getCharacters().forEach(character -> {
+                if (hungryCharacters.contains(character.getProfession())) {
+                    character.changeLife(-2);
+                    if (character.isDead()) {
+                        handleGameEnd();
+                    }
+                }
+            });
+
         } else {
             gameInfo.getAvaibleResources().setFoodAmount(foodAmount - requiredFood);
             int foodAmountAfterEat = gameInfo.getAvaibleResources().getFoodAmount();
@@ -383,7 +417,10 @@ public class GameEngineController {
 
         IslandTile camp = gameInfo.getCamp();
         if (!gameInfo.isShelter() && !camp.isHasNaturalShelter()) {
-            gameInfo.getCharacters().forEach(character -> character.setLife(character.getLife() - 1));
+            gameInfo.getCharacters().forEach(character -> {
+                character.changeLife(-1);
+                if (character.isDead()) handleGameEnd();
+            });
         }
 
         AtomicBoolean canStorageFood = new AtomicBoolean(false);
@@ -415,6 +452,25 @@ public class GameEngineController {
 
         updateFirstPlayer();
         logger.info("Pierwszy gracz: " + gameInfo.getFirstPlayer().getProfession());
+    }
+
+    private String askForHungryCharacter(List<ProfessionType> professions) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Brakuje jedzenia!");
+        alert.setHeaderText("Wygląda na to, że ktoś dzisiaj nie zje kolacji...");
+        alert.setContentText("Wybierz postać, która nie zje posiłku i otrzyma dwie rany.");
+
+        List<ButtonType> buttonTypes = new ArrayList<>();
+
+        for (ProfessionType profession : professions) {
+            buttonTypes.add(new ButtonType(profession.toString()));
+        }
+
+        alert.getButtonTypes().setAll(buttonTypes);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result.get().getText();
     }
 
 

@@ -5,15 +5,9 @@ import model.enums.SpecialSkillType;
 public interface ICharacter {
     void useSpecialSkill(SpecialSkillType specialSkillType);
 
-    int checkIfMoraleDownAndDecrease(int lifesNumber);
+    void changeLife(int lives);
 
-    void increaseLife(int lifesNumber);
+    void changeDetermination(int determinations);
 
-    void decreaseLife(int lifesNumber);
-
-    void increaseDetermination(int determinationsNumber);
-
-    void decreaseDetermination(int determinationsNumber);
-
-    boolean checkIfDead();
+    boolean isDead();
 }
