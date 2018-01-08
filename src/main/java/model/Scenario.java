@@ -1,14 +1,29 @@
 package model;
 
+import model.enums.DiceType;
+
+import java.util.List;
+import java.util.Map;
+
 public class Scenario implements IScenario {
     private int id;
     private int roundsNumber;
     private int round;
+    private Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping;
 
-    public Scenario(int id, int roundsNumber) {
+    public Scenario(int id, int roundsNumber, Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping) {
         this.id = id;
         this.roundsNumber = roundsNumber;
+        this.roundIdToWeatherDicesMapping = roundIdToWeatherDicesMapping;
         this.round = 0;
+    }
+
+    public Map<Integer, List<DiceType>> getRoundIdToWeatherDicesMapping() {
+        return roundIdToWeatherDicesMapping;
+    }
+
+    public void setRoundIdToWeatherDicesMapping(Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping) {
+        this.roundIdToWeatherDicesMapping = roundIdToWeatherDicesMapping;
     }
 
     public int getId() {

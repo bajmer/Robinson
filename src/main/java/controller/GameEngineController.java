@@ -6,10 +6,7 @@ import model.*;
 import model.Character;
 import model.cards.*;
 import model.cards.Stack;
-import model.enums.PhaseType;
-import model.enums.ProfessionType;
-import model.enums.ResourceType;
-import model.enums.SexType;
+import model.enums.*;
 import model.enums.cards.BeastType;
 import model.enums.cards.DiscoveryTokenType;
 import model.enums.cards.InventionType;
@@ -28,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameEngineController {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
@@ -47,6 +45,7 @@ public class GameEngineController {
     private Stack discoveryTokensStack;
     private Board board;
     private PhaseType phase;
+    private Dices dices;
 
     public GameEngineController(int scenarioId,
                                 Map<ProfessionType, SexType> choosedCharacters,
@@ -63,6 +62,7 @@ public class GameEngineController {
         mappings = new Mappings();
         gameInfo = new GameInfo();
         board = new Board();
+        dices = new Dices();
 
         createScenario(scenarioId);
         createCharacters(choosedCharacters);
@@ -78,7 +78,9 @@ public class GameEngineController {
 
     private void createScenario(int scenarioId) {
         //        tworzenie scenariusza
-        scenario = new Scenario(scenarioId, Mappings.getScenarioIdToRoundsNumberMapping().get(scenarioId));
+        scenario = new Scenario(scenarioId,
+                Mappings.getScenarioIdToRoundsNumberMapping().get(scenarioId),
+                Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenarioId));
         logger.info("Utworzono scenariusz");
     }
 
@@ -328,7 +330,6 @@ public class GameEngineController {
         int morale = GameInfo.getMoraleLevel();
         logger.info("Poziom morale: " + morale);
         Character firstPlayer = gameInfo.getFirstPlayer();
-        int determination = firstPlayer.getDetermination();
 
         firstPlayer.changeDetermination(morale);
         logger.info("Liczba żyć pierwszego gracza: " + firstPlayer.getLife());
@@ -359,8 +360,95 @@ public class GameEngineController {
     }
 
     private void handleWeatherPhase() {
+        AtomicInteger rainCloudsNumber = new AtomicInteger();
+        AtomicInteger snowCludsNumber = new AtomicInteger();
+        AtomicBoolean beastAttack = new AtomicBoolean(false);
+        AtomicBoolean palisadeDamage = new AtomicBoolean(false);
+        AtomicBoolean foodDiscard = new AtomicBoolean(false);
+
+        Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenario.getId()).get(scenario.getRound()).forEach(
+                diceType -> {
+                    DiceWallType result = dices.roll(dices.getDiceTypeToDiceMapping().get(diceType));
+                    logger.info("Rzut kostką " + diceType + ": " + result);
+                    switch (result) {
+                        case SINGLE_RAIN:
+                            rainCloudsNumber.getAndIncrement();
+                            break;
+                        case DOUBLE_RAIN:
+                            rainCloudsNumber.getAndAdd(2);
+                            break;
+                        case SINGLE_SNOW:
+                            snowCludsNumber.getAndIncrement();
+                            break;
+                        case DOUBLE_SNOW:
+                            snowCludsNumber.getAndAdd(2);
+                            break;
+                        case BEAST_ATTACK:
+                            beastAttack.set(true);
+                            break;
+                        case PALISADE_DAMAGE:
+                            palisadeDamage.set(true);
+                            break;
+                        case FOOD_DISCARD:
+                            foodDiscard.set(true);
+                            break;
+                    }
+                }
+        );
+        Resources resources = gameInfo.getAvaibleResources();
+
+        if (snowCludsNumber.get() > 0) {
+            resources.setWoodAmount(resources.getWoodAmount() - snowCludsNumber.get());
+            if (resources.getWoodAmount() < 0) {
+                decreaseAllCharactersLife(resources.getWoodAmount());
+                resources.setWoodAmount(0);
+            }
+        }
+
+        int cloudsSum = rainCloudsNumber.get() + snowCludsNumber.get();
+        int missingRoofLevel = cloudsSum - gameInfo.getRoofLevel();
+        if (missingRoofLevel > 0) {
+            resources.setWoodAmount(resources.getWoodAmount() - missingRoofLevel);
+            if (resources.getWoodAmount() < 0) {
+                decreaseAllCharactersLife(resources.getWoodAmount());
+                resources.setWoodAmount(0);
+            }
+            resources.setFoodAmount(resources.getFoodAmount() - missingRoofLevel);
+            if (resources.getFoodAmount() < 0) {
+                decreaseAllCharactersLife(resources.getFoodAmount());
+                resources.setFoodAmount(0);
+            }
+        }
+
+        if (beastAttack.get()) {
+            logger.info("Atak bestii o sile 3!");
+        } else if (palisadeDamage.get()) {
+            gameInfo.setPalisadeLevel(gameInfo.getPalisadeLevel() - 1);
+            if (gameInfo.getPalisadeLevel() < 0) {
+                decreaseAllCharactersLife(gameInfo.getPalisadeLevel());
+                gameInfo.setPalisadeLevel(0);
+            }
+        } else if (foodDiscard.get()) {
+            resources.setFoodAmount(resources.getFoodAmount() - 1);
+            if (resources.getFoodAmount() < 0) {
+                decreaseAllCharactersLife(resources.getFoodAmount());
+                resources.setFoodAmount(0);
+            }
+        }
+
+
 
     }
+
+    private void decreaseAllCharactersLife(int value) {
+        for (Character character : gameInfo.getCharacters()) {
+            character.changeLife(value);
+            if (character.isDead()) {
+                handleGameEnd();
+            }
+        }
+    }
+
 
     private void handleNightPhase() {
         int requiredFood = gameInfo.getCharacters().size();

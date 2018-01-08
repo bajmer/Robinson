@@ -17,6 +17,7 @@ import model.enums.cards.wreckagecards.WreckageThreatEffectType;
 
 import java.util.*;
 
+import static model.enums.DiceType.*;
 import static model.enums.PhaseType.*;
 import static model.enums.ProfessionType.*;
 import static model.enums.ResourceType.FOOD;
@@ -46,6 +47,14 @@ public class Mappings {
     private static Map<ExplorationAdventureType, AdventureEventEffectType> explorationAdventureToAdventureEventEffectMapping = new HashMap<>();
     private static Map<BeastType, List<Integer>> beastToBeastStatsMapping = new HashMap<>();
     private static Map<Integer, Integer> scenarioIdToRoundsNumberMapping = new HashMap<>();
+    private static Map<Integer, Map<Integer, List<DiceType>>> scenarioIdToRoundWeatherDicesMapMapping = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario1RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario2RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario3RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario4RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario5RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario6RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<DiceType>> scenario7RoundIdToWeatherDicesList = new HashMap<>();
     private static Map<InventionType, Boolean> inventionToIsMandatoryMapping = new HashMap<>();
     private static Map<InventionType, ProfessionType> inventionToOwnerMapping = new HashMap<>();
     private static Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping = new HashMap<>();
@@ -62,7 +71,6 @@ public class Mappings {
     private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
     private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
     private static Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping = new HashMap<>();
-
     public Mappings() {
         eventEffectToEventIconMapping.put(WINTER_DEPRESSION, BOOK);
         eventEffectToEventIconMapping.put(CHRONIC_TIREDNESS, BOOK);
@@ -398,11 +406,32 @@ public class Mappings {
 
         scenarioIdToRoundsNumberMapping.put(1, 12);
         scenarioIdToRoundsNumberMapping.put(2, 10);
-        scenarioIdToRoundsNumberMapping.put(3, 12);
+        scenarioIdToRoundsNumberMapping.put(3, 8);
         scenarioIdToRoundsNumberMapping.put(4, 12);
         scenarioIdToRoundsNumberMapping.put(5, 12);
         scenarioIdToRoundsNumberMapping.put(6, 12);
         scenarioIdToRoundsNumberMapping.put(7, 12);
+
+        scenarioIdToRoundWeatherDicesMapMapping.put(1, scenario1RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(2, scenario2RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(3, scenario3RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(4, scenario4RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(5, scenario5RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(6, scenario6RoundIdToWeatherDicesList);
+        scenarioIdToRoundWeatherDicesMapMapping.put(7, scenario7RoundIdToWeatherDicesList);
+
+        scenario1RoundIdToWeatherDicesList.put(1, new ArrayList<>());
+        scenario1RoundIdToWeatherDicesList.put(2, new ArrayList<>());
+        scenario1RoundIdToWeatherDicesList.put(3, new ArrayList<>());
+        scenario1RoundIdToWeatherDicesList.put(4, new ArrayList<>(Collections.singletonList(RAIN_CLOUD_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(5, new ArrayList<>(Collections.singletonList(RAIN_CLOUD_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(6, new ArrayList<>(Collections.singletonList(RAIN_CLOUD_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(7, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(8, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(9, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(10, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(11, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
+        scenario1RoundIdToWeatherDicesList.put(12, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
 
         inventionToIsMandatoryMapping.put(BOW, true);
         inventionToIsMandatoryMapping.put(BRICKS, true);
@@ -564,6 +593,70 @@ public class Mappings {
         currentPhaseToNextPhaseMapping.put(WEATHER_PHASE, NIGHT_PHASE);
         currentPhaseToNextPhaseMapping.put(NIGHT_PHASE, EVENT_PHASE);
 
+    }
+
+    public static Map<Integer, Map<Integer, List<DiceType>>> getScenarioIdToRoundWeatherDicesMapMapping() {
+        return scenarioIdToRoundWeatherDicesMapMapping;
+    }
+
+    public static void setScenarioIdToRoundWeatherDicesMapMapping(Map<Integer, Map<Integer, List<DiceType>>> scenarioIdToRoundWeatherDicesMapMapping) {
+        Mappings.scenarioIdToRoundWeatherDicesMapMapping = scenarioIdToRoundWeatherDicesMapMapping;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario1RoundIdToWeatherDicesList() {
+        return scenario1RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario1RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario1RoundIdToWeatherDicesList) {
+        Mappings.scenario1RoundIdToWeatherDicesList = scenario1RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario2RoundIdToWeatherDicesList() {
+        return scenario2RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario2RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario2RoundIdToWeatherDicesList) {
+        Mappings.scenario2RoundIdToWeatherDicesList = scenario2RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario3RoundIdToWeatherDicesList() {
+        return scenario3RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario3RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario3RoundIdToWeatherDicesList) {
+        Mappings.scenario3RoundIdToWeatherDicesList = scenario3RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario4RoundIdToWeatherDicesList() {
+        return scenario4RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario4RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario4RoundIdToWeatherDicesList) {
+        Mappings.scenario4RoundIdToWeatherDicesList = scenario4RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario5RoundIdToWeatherDicesList() {
+        return scenario5RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario5RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario5RoundIdToWeatherDicesList) {
+        Mappings.scenario5RoundIdToWeatherDicesList = scenario5RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario6RoundIdToWeatherDicesList() {
+        return scenario6RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario6RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario6RoundIdToWeatherDicesList) {
+        Mappings.scenario6RoundIdToWeatherDicesList = scenario6RoundIdToWeatherDicesList;
+    }
+
+    public static Map<Integer, List<DiceType>> getScenario7RoundIdToWeatherDicesList() {
+        return scenario7RoundIdToWeatherDicesList;
+    }
+
+    public static void setScenario7RoundIdToWeatherDicesList(Map<Integer, List<DiceType>> scenario7RoundIdToWeatherDicesList) {
+        Mappings.scenario7RoundIdToWeatherDicesList = scenario7RoundIdToWeatherDicesList;
     }
 
     public static Map<PhaseType, PhaseType> getCurrentPhaseToNextPhaseMapping() {
