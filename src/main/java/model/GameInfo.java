@@ -4,6 +4,7 @@ import model.cards.InventionCard;
 import model.cards.IslandTile;
 import model.cards.MysteryTreasureCard;
 import model.cards.StartingItemCard;
+import model.enums.ProfessionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,5 +185,71 @@ public class GameInfo {
 
     public void setStartingItems(List<StartingItemCard> startingItems) {
         this.startingItems = startingItems;
+    }
+
+    private void decreaseLifeForAllCharacters(int value) {
+        characters.forEach(character -> character.changeLife(value));
+    }
+
+    public void decreaseWood(int value) {
+        int woodAmount = avaibleResources.getWoodAmount();
+        if (woodAmount >= value) {
+            avaibleResources.setWoodAmount(woodAmount - value);
+        } else {
+            int missingWood = value - woodAmount;
+            avaibleResources.setWoodAmount(0);
+            decreaseLifeForAllCharacters(-missingWood);
+        }
+    }
+
+    public void decreaseFood(int value, List<ProfessionType> starvingProfessions) {
+        int shortExpiryDateFoodAmount = avaibleResources.getFoodAmount();
+        int longExpiryDateFoodAmount = avaibleResources.getLongExpiryDateFoodsAmount();
+        if (shortExpiryDateFoodAmount >= value) {
+            avaibleResources.setFoodAmount(shortExpiryDateFoodAmount - value);
+        } else {
+            int missingLongExpiryFood = value - shortExpiryDateFoodAmount;
+            avaibleResources.setFoodAmount(0);
+            if (longExpiryDateFoodAmount >= missingLongExpiryFood) {
+                avaibleResources.setLongExpiryDateFoodsAmount(longExpiryDateFoodAmount - missingLongExpiryFood);
+            } else {
+                int missingFood = missingLongExpiryFood - longExpiryDateFoodAmount;
+                avaibleResources.setLongExpiryDateFoodsAmount(0);
+                if (starvingProfessions == null) {
+                    decreaseLifeForAllCharacters(-missingFood);
+                } else {
+                    characters.forEach(character -> {
+                        if (starvingProfessions.contains(character.getProfession())) {
+                            character.changeLife(-2);
+                        }
+                    });
+                }
+
+            }
+        }
+    }
+
+    public void changePalisadeLevel(int value) {
+        palisadeLevel += value;
+        if (palisadeLevel < 0) {
+            decreaseLifeForAllCharacters(palisadeLevel);
+            palisadeLevel = 0;
+        }
+    }
+
+    public void changeRoofLevel(int value) {
+        roofLevel += value;
+        if (roofLevel < 0) {
+            decreaseLifeForAllCharacters(roofLevel);
+            roofLevel = 0;
+        }
+    }
+
+    public void changeWeaponLevel(int value) {
+        weaponLevel += value;
+        if (weaponLevel < 0) {
+            decreaseLifeForAllCharacters(weaponLevel);
+            weaponLevel = 0;
+        }
     }
 }

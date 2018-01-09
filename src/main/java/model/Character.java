@@ -1,13 +1,17 @@
 package model;
 
+import controller.GameEndListener;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 import model.enums.SpecialSkillType;
 import model.enums.cards.InventionType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 public class Character implements ICharacter {
+    private Logger logger = LogManager.getLogger(Character.class);
     private ProfessionType profession;
     private SexType sex;
     private InventionType personalInvention;
@@ -16,8 +20,9 @@ public class Character implements ICharacter {
     private int life;
     private int determination;
     private boolean firstPlayer;
+    private GameEndListener listener;
 
-    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life) {
+    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, GameEndListener listener) {
         this.profession = profession;
         this.sex = sex;
         this.personalInvention = personalInvention;
@@ -26,6 +31,7 @@ public class Character implements ICharacter {
         this.life = life;
         this.determination = 0;
         this.firstPlayer = false;
+        this.listener = listener;
     }
 
     public InventionType getPersonalInvention() {
@@ -93,18 +99,57 @@ public class Character implements ICharacter {
     }
 
     public void useSpecialSkill(SpecialSkillType specialSkillType) {
-
+        switch (specialSkillType) {
+            case ECONOMICAL_CONSTRUCTION:
+                break;
+            case CRAFT:
+                break;
+            case NEW_IDEA:
+                break;
+            case HANDYMAN:
+                break;
+            case GRANDMAS_RECIPE:
+                break;
+            case SHARP_EYE:
+                break;
+            case NAIL_SOUP:
+                break;
+            case HOOCH:
+                break;
+            case LUCKY_MAN:
+                break;
+            case RECONNAISSANCE:
+                break;
+            case MOTIVATIONAL_SPEECH:
+                break;
+            case SCOUT:
+                break;
+            case TRACKING:
+                break;
+            case HOUNTING:
+                break;
+            case FURY:
+                break;
+            case EMERGENCY_PLAN:
+                break;
+        }
     }
 
     public void changeLife(int lives) {
         if (lives < 0) {
             for (int i = life; i >= life + lives; i--) {
                 if (moraleDown.contains(i)) {
+                    logger.debug("Spadek morale!");
                     GameInfo.changeMoraleLevel(-1);
                 }
             }
         }
         life += lives;
+        logger.debug("Liczba żyć " + profession + ": " + life);
+
+        if (life <= 0) {
+            listener.handleGameEnd();
+        }
     }
 
     @Override
@@ -114,9 +159,5 @@ public class Character implements ICharacter {
             changeLife(determination);
             determination = 0;
         }
-    }
-
-    public boolean isDead() {
-        return life < 1;
     }
 }

@@ -15,17 +15,32 @@ public class WreckageCard implements Usable {
         this.wreckageThreatEffect = wreckageThreatEffect;
     }
 
-    @Override
-    public void use() {
-        System.out.println("Karta wraku: " + wreckageEventEffect);
+    public WreckageEventEffectType getWreckageEventEffect() {
+        return wreckageEventEffect;
+    }
+
+    public void setWreckageEventEffect(WreckageEventEffectType wreckageEventEffect) {
+        this.wreckageEventEffect = wreckageEventEffect;
+    }
+
+    public WreckageThreatActionType getWreckageThreatAction() {
+        return wreckageThreatAction;
+    }
+
+    public void setWreckageThreatAction(WreckageThreatActionType wreckageThreatAction) {
+        this.wreckageThreatAction = wreckageThreatAction;
+    }
+
+    public WreckageThreatEffectType getWreckageThreatEffect() {
+        return wreckageThreatEffect;
+    }
+
+    public void setWreckageThreatEffect(WreckageThreatEffectType wreckageThreatEffect) {
+        this.wreckageThreatEffect = wreckageThreatEffect;
     }
 
     @Override
-    public String toString() {
-        return "WreckageCard{" +
-                "wreckageEventEffect=" + wreckageEventEffect +
-                ", wreckageThreatAction=" + wreckageThreatAction +
-                ", wreckageThreatEffect=" + wreckageThreatEffect +
-                '}';
+    public void use() {
+
     }
 }

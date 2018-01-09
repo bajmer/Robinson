@@ -5,5 +5,5 @@ public interface IScenario {
 
     void handleBook();
 
-    boolean nextRound();
+    void nextRound();
 }

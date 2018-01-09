@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import model.*;
 import model.Character;
@@ -27,7 +28,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class GameEngineController {
+import static model.enums.ProfessionType.*;
+
+public class GameEngineController implements GameEndListener {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
     private Scenario scenario;
     private GameInfo gameInfo;
@@ -47,12 +50,12 @@ public class GameEngineController {
     private PhaseType phase;
     private Dices dices;
 
-    public GameEngineController(int scenarioId,
-                                Map<ProfessionType, SexType> choosedCharacters,
-                                boolean isFriday,
-                                boolean isDog,
-                                WreckageEventEffectType wreckageEvent,
-                                int startingItemsNumber) {
+    GameEngineController(int scenarioId,
+                         Map<ProfessionType, SexType> choosedCharacters,
+                         boolean isFriday,
+                         boolean isDog,
+                         WreckageEventEffectType wreckageEvent,
+                         int startingItemsNumber) {
 
         this.isFriday = isFriday;
         this.isDog = isDog;
@@ -80,7 +83,8 @@ public class GameEngineController {
         //        tworzenie scenariusza
         scenario = new Scenario(scenarioId,
                 Mappings.getScenarioIdToRoundsNumberMapping().get(scenarioId),
-                Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenarioId));
+                Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenarioId),
+                this);
         logger.info("Utworzono scenariusz");
     }
 
@@ -95,7 +99,8 @@ public class GameEngineController {
                     Mappings.getProfessionToPersonalInventionMapping().get(profession),
                     Mappings.getProfessionToSpecialSkillMapping().get(profession),
                     Mappings.getProfessionToMoraleDownMapping().get(profession),
-                    Mappings.getProfessionToLifeMapping().get(profession)));
+                    Mappings.getProfessionToLifeMapping().get(profession),
+                    this));
         }
         logger.info("Utworzono postacie");
     }
@@ -285,16 +290,17 @@ public class GameEngineController {
     public void nextPhase() {
         phase = Mappings.getCurrentPhaseToNextPhaseMapping().get(phase);
         if (phase == PhaseType.EVENT_PHASE) {
-            updateGameParams();
+            scenario.nextRound();
+            logger.info("***********************************************************");
+            logger.info("Runda numer: " + scenario.getRound());
+
+            int firstPlayerId = (scenario.getRound() - 1) % gameInfo.getCharacters().size();
+            gameInfo.setFirstPlayer(gameInfo.getCharacters().get(firstPlayerId));
+            logger.debug("Pierwszy gracz: " + gameInfo.getFirstPlayer().getProfession());
         }
 
         logger.info("Obecna faza: " + phase);
         runPhase();
-    }
-
-    private void updateFirstPlayer() {
-        int firstPlayerId = (scenario.getRound() - 1) % gameInfo.getCharacters().size();
-        gameInfo.setFirstPlayer(gameInfo.getCharacters().get(firstPlayerId));
     }
 
     private void runPhase() {
@@ -322,22 +328,21 @@ public class GameEngineController {
 
     private void handleEventPhase() {
         Usable card = eventStack.getStack().removeFirst();
+        if (card instanceof WreckageCard) {
+            logger.info("--->Karta wraku: " + ((WreckageCard) card).getWreckageEventEffect());
+        } else if (card instanceof EventCard) {
+            logger.info("--->Karta wydarzenia: " + ((EventCard) card).getEventEffect());
+        }
+
         card.use();
-//        logger.info(card.getEventEffect());
     }
 
     private void handleMoralePhase() {
         int morale = GameInfo.getMoraleLevel();
-        logger.info("Poziom morale: " + morale);
         Character firstPlayer = gameInfo.getFirstPlayer();
+        logger.info("--->Poziom morale: " + morale);
 
         firstPlayer.changeDetermination(morale);
-        logger.info("Liczba żyć pierwszego gracza: " + firstPlayer.getLife());
-        logger.info("Liczba żetonów determinacji pierwszego gracza: " + firstPlayer.getDetermination());
-
-        if (firstPlayer.isDead()) {
-            handleGameEnd();
-        }
     }
 
     private void handleProductionPhase() {
@@ -349,9 +354,11 @@ public class GameEngineController {
 
         if (camp.getLeftSquareResource() == ResourceType.WOOD || camp.getRightSquareResource() == ResourceType.WOOD) {
             gameInfo.getAvaibleResources().setWoodAmount(tmpWood + woodProduction);
+            logger.debug("--->Otrzymano " + woodProduction + " drewna.");
         }
         if (camp.getLeftSquareResource() == ResourceType.FOOD || camp.getRightSquareResource() == ResourceType.FOOD) {
             gameInfo.getAvaibleResources().setFoodAmount(tmpFood + foodProduction);
+            logger.debug("--->Otrzymano " + foodProduction + " jedzenia.");
         }
     }
 
@@ -369,7 +376,7 @@ public class GameEngineController {
         Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenario.getId()).get(scenario.getRound()).forEach(
                 diceType -> {
                     DiceWallType result = dices.roll(dices.getDiceTypeToDiceMapping().get(diceType));
-                    logger.info("Rzut kostką " + diceType + ": " + result);
+                    logger.info("--->Rzut kostką " + diceType + ". Wynik: " + result);
                     switch (result) {
                         case SINGLE_RAIN:
                             rainCloudsNumber.getAndIncrement();
@@ -395,60 +402,30 @@ public class GameEngineController {
                     }
                 }
         );
-        Resources resources = gameInfo.getAvaibleResources();
 
         if (snowCludsNumber.get() > 0) {
-            resources.setWoodAmount(resources.getWoodAmount() - snowCludsNumber.get());
-            if (resources.getWoodAmount() < 0) {
-                decreaseAllCharactersLife(resources.getWoodAmount());
-                resources.setWoodAmount(0);
-            }
+            logger.debug("--->Liczba chmur ziomowych: " + snowCludsNumber.get() + ". Za każdą chmurę należy odrzucić 1 drewno.");
+            gameInfo.decreaseWood(snowCludsNumber.get());
         }
 
         int cloudsSum = rainCloudsNumber.get() + snowCludsNumber.get();
         int missingRoofLevel = cloudsSum - gameInfo.getRoofLevel();
         if (missingRoofLevel > 0) {
-            resources.setWoodAmount(resources.getWoodAmount() - missingRoofLevel);
-            if (resources.getWoodAmount() < 0) {
-                decreaseAllCharactersLife(resources.getWoodAmount());
-                resources.setWoodAmount(0);
-            }
-            resources.setFoodAmount(resources.getFoodAmount() - missingRoofLevel);
-            if (resources.getFoodAmount() < 0) {
-                decreaseAllCharactersLife(resources.getFoodAmount());
-                resources.setFoodAmount(0);
-            }
+            logger.debug("--->Liczba wszystkich chmur: " + cloudsSum + ". Za każdy brakujący poziom dachu należy odrzucić 1 drewno i 1 jedzenie.");
+            gameInfo.decreaseWood(missingRoofLevel);
+            gameInfo.decreaseFood(missingRoofLevel, null);
         }
 
         if (beastAttack.get()) {
-            logger.info("Atak bestii o sile 3!");
+            logger.info("--->Atak bestii o sile 3!");
         } else if (palisadeDamage.get()) {
-            gameInfo.setPalisadeLevel(gameInfo.getPalisadeLevel() - 1);
-            if (gameInfo.getPalisadeLevel() < 0) {
-                decreaseAllCharactersLife(gameInfo.getPalisadeLevel());
-                gameInfo.setPalisadeLevel(0);
-            }
+            logger.info("--->Poziom palisady spada o 1!");
+            gameInfo.changePalisadeLevel(-1);
         } else if (foodDiscard.get()) {
-            resources.setFoodAmount(resources.getFoodAmount() - 1);
-            if (resources.getFoodAmount() < 0) {
-                decreaseAllCharactersLife(resources.getFoodAmount());
-                resources.setFoodAmount(0);
-            }
-        }
-
-
-
-    }
-
-    private void decreaseAllCharactersLife(int value) {
-        for (Character character : gameInfo.getCharacters()) {
-            character.changeLife(value);
-            if (character.isDead()) {
-                handleGameEnd();
-            }
+            logger.info("--->Należy odrzucić 1 jedzenie!");
+            gameInfo.decreaseFood(1, null);
         }
     }
-
 
     private void handleNightPhase() {
         int requiredFood = gameInfo.getCharacters().size();
@@ -456,97 +433,69 @@ public class GameEngineController {
         int longExpiryDateFoodAmount = gameInfo.getAvaibleResources().getLongExpiryDateFoodsAmount();
         int allFoodAmount = foodAmount + longExpiryDateFoodAmount;
 
-        if (allFoodAmount < requiredFood) {
-            //wybór postaci, która nie zje
-            List<ProfessionType> possibleCharacters = new ArrayList<>();
-            List<ProfessionType> hungryCharacters = new ArrayList<>();
-            gameInfo.getCharacters().forEach(character -> possibleCharacters.add(character.getProfession()));
+        logger.debug("--->Kolacja! Każda postać musi zjeść posiłek...");
+        gameInfo.decreaseFood(requiredFood, chooseStarvingCharacters(requiredFood - allFoodAmount));
 
-            for (int i = 0; i < requiredFood - allFoodAmount; i++) {
-                String result = askForHungryCharacter(possibleCharacters);
-                if (result.equals(ProfessionType.CARPENTER.toString())) {
-                    logger.info("Głoduje cieśla!");
-                    possibleCharacters.remove(ProfessionType.CARPENTER);
-                    hungryCharacters.add(ProfessionType.CARPENTER);
-                } else if (result.equals(ProfessionType.COOK.toString())) {
-                    logger.info("Głoduje kucharz!");
-                    possibleCharacters.remove(ProfessionType.COOK);
-                    hungryCharacters.add(ProfessionType.COOK);
-                } else if (result.equals(ProfessionType.EXPLORER.toString())) {
-                    logger.info("Głoduje odkrywca!");
-                    possibleCharacters.remove(ProfessionType.EXPLORER);
-                    hungryCharacters.add(ProfessionType.EXPLORER);
-                } else if (result.equals(ProfessionType.SOLDIER.toString())) {
-                    logger.info("Głoduje żołnierz!");
-                    possibleCharacters.remove(ProfessionType.SOLDIER);
-                    hungryCharacters.add(ProfessionType.SOLDIER);
-                }
-            }
-
-            gameInfo.getCharacters().forEach(character -> {
-                if (hungryCharacters.contains(character.getProfession())) {
-                    character.changeLife(-2);
-                    if (character.isDead()) {
-                        handleGameEnd();
-                    }
-                }
-            });
-
-        } else {
-            gameInfo.getAvaibleResources().setFoodAmount(foodAmount - requiredFood);
-            int foodAmountAfterEat = gameInfo.getAvaibleResources().getFoodAmount();
-            if (foodAmountAfterEat < 0) {
-                gameInfo.getAvaibleResources().setLongExpiryDateFoodsAmount(longExpiryDateFoodAmount + foodAmountAfterEat);
-                gameInfo.getAvaibleResources().setFoodAmount(0);
-            }
-        }
-
-        //opcja przeniesienia obozu
-
+//        opcja przeniesienia obozu
         IslandTile camp = gameInfo.getCamp();
         if (!gameInfo.isShelter() && !camp.isHasNaturalShelter()) {
-            gameInfo.getCharacters().forEach(character -> {
-                character.changeLife(-1);
-                if (character.isDead()) handleGameEnd();
-            });
+            logger.info("--->Brak schronienia! Tę noc wszyscy spędzą pod gołym niebem!");
+            gameInfo.getCharacters().forEach(character -> character.changeLife(-1));
         }
 
         AtomicBoolean canStorageFood = new AtomicBoolean(false);
         gameInfo.getInventions().forEach(inventionCard -> {
             if (inventionCard.getInvention() == InventionType.CELLAR) canStorageFood.set(true);
         });
-
         gameInfo.getTreasures().forEach(mysteryTreasureCard -> {
             if (mysteryTreasureCard.getTreasureType() == MysteryTreasureType.BARREL
                 /*|| mysteryTreasureCard.getTreasureType() == skrzynie*/) canStorageFood.set(true);
         });
 
         if (!canStorageFood.get()) {
+            logger.debug("--->Nie masz w czym przechowywać jedzenia! Całe psujące się jedzenie należy odrzucić!");
             gameInfo.getAvaibleResources().setFoodAmount(0);
         }
     }
 
-    private void handleGameEnd() {
-        logger.info("Koniec gry!");
-    }
+    private List<ProfessionType> chooseStarvingCharacters(int value) {
+        List<ProfessionType> starvingProfessions = null;
+        if (value > 1) {
+            starvingProfessions = new ArrayList<>();
+            List<ProfessionType> notChosenProfessions = new ArrayList<>();
+            gameInfo.getCharacters().forEach(character -> notChosenProfessions.add(character.getProfession()));
 
-    private void updateGameParams() {
-        boolean isGameEnd = scenario.nextRound();
-        if (isGameEnd) {
-            handleGameEnd();
+            for (int i = 0; i < value; i++) {
+                String result = showStarvingCharactersAlert(notChosenProfessions);
+                if (result != null) {
+                    if (result.equals(CARPENTER.toString())) {
+                        notChosenProfessions.remove(CARPENTER);
+                        starvingProfessions.add(CARPENTER);
+                        logger.info("--->Dziś kolacji nie zje cieśla!");
+                    } else if (result.equals(COOK.toString())) {
+                        notChosenProfessions.remove(COOK);
+                        starvingProfessions.add(COOK);
+                        logger.info("--->Dziś kolacji nie zje kucharz!");
+                    } else if (result.equals(EXPLORER.toString())) {
+                        notChosenProfessions.remove(EXPLORER);
+                        starvingProfessions.add(EXPLORER);
+                        logger.info("--->Dziś kolacji nie zje odkrywca!");
+                    } else if (result.equals(SOLDIER.toString())) {
+                        notChosenProfessions.remove(SOLDIER);
+                        starvingProfessions.add(SOLDIER);
+                        logger.info("--->Dziś kolacji nie zje żołnierz!");
+                    }
+                }
+            }
         }
-        logger.info("***********************************************************");
-        logger.info("Runda numer: " + scenario.getRound());
-
-        updateFirstPlayer();
-        logger.info("Pierwszy gracz: " + gameInfo.getFirstPlayer().getProfession());
+        return starvingProfessions;
     }
 
-    private String askForHungryCharacter(List<ProfessionType> professions) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    private String showStarvingCharactersAlert(List<ProfessionType> professions) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Brakuje jedzenia!");
         alert.setHeaderText("Wygląda na to, że ktoś dzisiaj nie zje kolacji...");
-        alert.setContentText("Wybierz postać, która nie zje posiłku i otrzyma dwie rany.");
+        alert.setContentText("Wybierz postać, która będzie dziś głodować i otrzyma 2 rany.");
 
         List<ButtonType> buttonTypes = new ArrayList<>();
 
@@ -555,10 +504,23 @@ public class GameEngineController {
         }
 
         alert.getButtonTypes().setAll(buttonTypes);
-
         Optional<ButtonType> result = alert.showAndWait();
 
-        return result.get().getText();
+        if (result.isPresent()) {
+            return result.get().getText();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void handleGameEnd() {
+        logger.info("KONIEC GRY!");
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle("Przegrałeś!");
+        alert.setHeaderText("Koniec gry!");
+        alert.setContentText("Twój wynik to:");
+        alert.showAndWait();
     }
 
 
