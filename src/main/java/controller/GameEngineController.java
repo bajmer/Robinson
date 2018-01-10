@@ -5,9 +5,14 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import model.*;
 import model.Character;
+import model.actions.*;
 import model.cards.*;
 import model.cards.Stack;
-import model.enums.*;
+import model.elements.Dices;
+import model.elements.Marker;
+import model.enums.PhaseType;
+import model.enums.ProfessionType;
+import model.enums.SexType;
 import model.enums.cards.BeastType;
 import model.enums.cards.DiscoveryTokenType;
 import model.enums.cards.InventionType;
@@ -20,7 +25,8 @@ import model.enums.cards.eventcards.EventIconType;
 import model.enums.cards.mysterycards.MysteryMonsterType;
 import model.enums.cards.mysterycards.MysteryTrapType;
 import model.enums.cards.mysterycards.MysteryTreasureType;
-import model.enums.cards.wreckagecards.WreckageEventEffectType;
+import model.enums.elements.DiceWallType;
+import model.enums.elements.ResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,16 +35,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static model.enums.ProfessionType.*;
+import static model.enums.cards.eventcards.EventEffectType.*;
+import static model.enums.cards.eventcards.EventIconType.*;
+import static model.enums.elements.MarkerType.*;
 
 public class GameEngineController implements GameEndListener {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
     private Scenario scenario;
     private GameInfo gameInfo;
-    private boolean isFriday;
-    private boolean isDog;
     private Mappings mappings;
     private Stack inventionStack;
-    private Stack eventStack;
+    private LinkedList<EventCard> eventStack;
     private Stack buildingAdventuresStack;
     private Stack gatheringResourcesAdventureStack;
     private Stack explorationAdventuresStack;
@@ -49,18 +56,22 @@ public class GameEngineController implements GameEndListener {
     private Board board;
     private PhaseType phase;
     private Dices dices;
+    private boolean isFriday;
+
+    private List<Action> actionList;
 
     GameEngineController(int scenarioId,
                          Map<ProfessionType, SexType> choosedCharacters,
                          boolean isFriday,
                          boolean isDog,
-                         WreckageEventEffectType wreckageEvent,
+                         EventEffectType wreckageEvent,
                          int startingItemsNumber) {
 
         this.isFriday = isFriday;
-        this.isDog = isDog;
-//        todo
-//        stworzyć piętaszka i psa
+
+        if (isDog) {
+
+        }
 
         mappings = new Mappings();
         gameInfo = new GameInfo();
@@ -77,6 +88,23 @@ public class GameEngineController implements GameEndListener {
         createDiscoveryTokensStack();
         createStartingItems(startingItemsNumber);
         createIslandTilesStack();
+
+        actionList = new ArrayList<>();
+        actionList.add(new ThreadAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER))));
+        actionList.add(new HuntingAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, DOG_MARKER, HUNTING_HELPER_MARKER))));
+        actionList.add(new BuildingAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, BUILDING_HELPER_MARKER))));
+        actionList.add(new GatheringResourcesAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, GATHERING_RESOURCES_HELPER_MARKER))));
+        actionList.add(new ExplorationAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, DOG_MARKER, EXPLORATION_HELPER_MARKER))));
+        actionList.add(new CampOrderingAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER))));
+        actionList.add(new RestAction(new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER))));
+    }
+
+    public GameInfo getGameInfo() {
+        return gameInfo;
+    }
+
+    public void setGameInfo(GameInfo gameInfo) {
+        this.gameInfo = gameInfo;
     }
 
     private void createScenario(int scenarioId) {
@@ -93,6 +121,9 @@ public class GameEngineController implements GameEndListener {
         for (Map.Entry<ProfessionType, SexType> entry : choosedCharacters.entrySet()) {
             ProfessionType profession = entry.getKey();
             SexType sex = entry.getValue();
+            List<Marker> markers = new ArrayList<>();
+            markers.add(new Marker(Mappings.getProfessionToMarkerMapping().get(profession)));
+            markers.add(new Marker(Mappings.getProfessionToMarkerMapping().get(profession)));
             gameInfo.getCharacters().add(new Character(
                     profession,
                     sex,
@@ -100,50 +131,61 @@ public class GameEngineController implements GameEndListener {
                     Mappings.getProfessionToSpecialSkillMapping().get(profession),
                     Mappings.getProfessionToMoraleDownMapping().get(profession),
                     Mappings.getProfessionToLifeMapping().get(profession),
+                    markers,
                     this));
         }
+
+        if (isFriday) {
+            gameInfo.getCharacters().add(new Friday(4, new ArrayList<>(Collections.singletonList(new Marker(FRIDAY_MARKER)))));
+        }
+
         logger.info("Utworzono postacie");
     }
 
-    private void createEventCardsDeck(WreckageEventEffectType wreckageEvent) {
-        //        karty wydarzeń
-        Stack allEventsStack = new Stack();
-        Arrays.asList(EventEffectType.values()).forEach(eventEffect -> allEventsStack.getStack().add(new EventCard(
-                eventEffect,
-                Mappings.getEventEffectToEventIconMapping().get(eventEffect),
-                Mappings.getEventEffectToThreatActionMapping().get(eventEffect),
-                Mappings.getEventEffectToThreatEffectMapping().get(eventEffect))));
-        Collections.shuffle(allEventsStack.getStack());
+    private void createEventCardsDeck(EventEffectType wreckageEvent) {
+//        karty wydarzeń
+        LinkedList<EventCard> allEventsStack = new LinkedList<>();
+        Arrays.asList(EventEffectType.values()).forEach(eventEffectType -> {
+            if (eventEffectType != FOOD_CRATES && eventEffectType != WRECKED_LIFEBOAT && eventEffectType != CAPTAINS_CHEST) {
+                allEventsStack.add(new EventCard(
+                        eventEffectType,
+                        Mappings.getEventEffectToEventIconMapping().get(eventEffectType),
+                        Mappings.getEventEffectToThreatActionMapping().get(eventEffectType),
+                        Mappings.getEventEffectToThreatEffectMapping().get(eventEffectType)
+                ));
+            }
+        });
+        Collections.shuffle(allEventsStack);
 
-        eventStack = new Stack();
-
-        eventStack.getStack().add(new WreckageCard(
-                wreckageEvent,
-                Mappings.getWreckageEventToWreckageThreatActionMapping().get(wreckageEvent),
-                Mappings.getWreckageEventToWreckageThreatEffectMapping().get(wreckageEvent)));
-
+        eventStack = new LinkedList<>();
         int bookIconsCounter = 0;
         int questionmarkIconsCouter = 0;
 
-        for (Usable card : allEventsStack.getStack()) {
-            EventCard eventCard = (EventCard) card;
-            if (eventCard.getEventIcon() == EventIconType.BOOK && bookIconsCounter < scenario.getRoundsNumber() / 2) {
-                eventStack.getStack().add(eventCard);
+        for (EventCard card : allEventsStack) {
+            if (card.getEventIcon() == BOOK && bookIconsCounter < scenario.getRoundsNumber() / 2) {
+                eventStack.add(card);
                 bookIconsCounter++;
                 continue;
             }
-            if ((eventCard.getEventIcon() == EventIconType.BUILDING_ADVENTURE ||
-                    eventCard.getEventIcon() == EventIconType.GATHERING_RESOURCES_ADVENTURE ||
-                    eventCard.getEventIcon() == EventIconType.EXPLORATION_ADVENTURE) &&
+            if ((card.getEventIcon() == BUILDING_ADVENTURE ||
+                    card.getEventIcon() == GATHERING_RESOURCES_ADVENTURE ||
+                    card.getEventIcon() == EXPLORATION_ADVENTURE) &&
                     questionmarkIconsCouter < scenario.getRoundsNumber() / 2) {
-                eventStack.getStack().add(eventCard);
+                eventStack.add(card);
                 questionmarkIconsCouter++;
             }
         }
 
-        logger.info("Przygotowano talię wydarzeń");
-        for (Usable usable : eventStack.getStack()) {
-            logger.debug(usable.toString());
+        eventStack.addFirst(new EventCard(
+                wreckageEvent,
+                Mappings.getEventEffectToEventIconMapping().get(wreckageEvent),
+                Mappings.getEventEffectToThreatActionMapping().get(wreckageEvent),
+                Mappings.getEventEffectToThreatEffectMapping().get(wreckageEvent)
+        ));
+
+        logger.info("Przygotowano talię wydarzeń.");
+        for (EventCard card : eventStack) {
+            logger.debug(card.getEventEffect());
         }
     }
 
@@ -166,9 +208,11 @@ public class GameEngineController implements GameEndListener {
                     inventionStack.getStack().add(inventionCard);
                 } else {
                     boolean characterEqualsOwner = false;
-                    for (Character character : gameInfo.getCharacters()) {
-                        if (character.getProfession() == owner) {
-                            characterEqualsOwner = true;
+                    for (ICharacter character : gameInfo.getCharacters()) {
+                        if (character instanceof Character) {
+                            if (((Character) character).getProfession() == owner) {
+                                characterEqualsOwner = true;
+                            }
                         }
                     }
                     if (characterEqualsOwner) {
@@ -294,50 +338,71 @@ public class GameEngineController implements GameEndListener {
             logger.info("***********************************************************");
             logger.info("Runda numer: " + scenario.getRound());
 
-            int firstPlayerId = (scenario.getRound() - 1) % gameInfo.getCharacters().size();
-            gameInfo.setFirstPlayer(gameInfo.getCharacters().get(firstPlayerId));
+            int firstPlayerId;
+            if (!isFriday) {
+                firstPlayerId = (scenario.getRound() - 1) % gameInfo.getCharacters().size();
+            } else {
+                firstPlayerId = (scenario.getRound() - 1) % (gameInfo.getCharacters().size() - 1);
+            }
+
+            gameInfo.setFirstPlayer((Character) gameInfo.getCharacters().get(firstPlayerId));
             logger.debug("Pierwszy gracz: " + gameInfo.getFirstPlayer().getProfession());
+
+            prepareAvaibleMarkers();
         }
 
         logger.info("Obecna faza: " + phase);
         runPhase();
     }
 
+    private void prepareAvaibleMarkers() {
+        for (ICharacter character : gameInfo.getCharacters()) {
+            if (character instanceof Character) {
+                character.getCharacterMarkers().forEach(marker -> gameInfo.getAvaibleCharactersMarkers().add(marker));
+            }
+        }
+    }
+
     private void runPhase() {
         switch (phase) {
             case EVENT_PHASE:
-                handleEventPhase();
+                runEventPhase();
                 break;
             case MORALE_PHASE:
-                handleMoralePhase();
+                runMoralePhase();
                 break;
             case PRODUCTION_PHASE:
-                handleProductionPhase();
+                runProductionPhase();
                 break;
             case ACTION_PHASE:
-                handleActionPhase();
+                runActionPhase();
                 break;
             case WEATHER_PHASE:
-                handleWeatherPhase();
+                runWeatherPhase();
                 break;
             case NIGHT_PHASE:
-                handleNightPhase();
+                runNightPhase();
                 break;
         }
     }
 
-    private void handleEventPhase() {
-        Usable card = eventStack.getStack().removeFirst();
-        if (card instanceof WreckageCard) {
-            logger.info("--->Karta wraku: " + ((WreckageCard) card).getWreckageEventEffect());
-        } else if (card instanceof EventCard) {
-            logger.info("--->Karta wydarzenia: " + ((EventCard) card).getEventEffect());
-        }
-
+    private void runEventPhase() {
+        EventCard card = eventStack.removeFirst();
+        logger.info("--->Wydarzenie: " + card.getEventEffect());
         card.use();
+
+        EventIconType eventIcon = card.getEventIcon();
+        //handleIcon(eventIcon);
+
+        gameInfo.getThreatActionCards().addFirst(card);
+        if (gameInfo.getThreatActionCards().size() > 2) {
+            EventCard threadCard = gameInfo.getThreatActionCards().removeLast();
+            threadCard.runThreatEffect();
+            logger.info("--->Efekt zagrożenia: " + threadCard.getThreatEffect());
+        }
     }
 
-    private void handleMoralePhase() {
+    private void runMoralePhase() {
         int morale = GameInfo.getMoraleLevel();
         Character firstPlayer = gameInfo.getFirstPlayer();
         logger.info("--->Poziom morale: " + morale);
@@ -345,7 +410,7 @@ public class GameEngineController implements GameEndListener {
         firstPlayer.changeDetermination(morale);
     }
 
-    private void handleProductionPhase() {
+    private void runProductionPhase() {
         IslandTile camp = gameInfo.getCamp();
         int tmpWood = gameInfo.getAvaibleResources().getWoodAmount();
         int woodProduction = gameInfo.getProductionWoodNumber();
@@ -362,11 +427,13 @@ public class GameEngineController implements GameEndListener {
         }
     }
 
-    private void handleActionPhase() {
+    private void runActionPhase() {
+//        przygotowanie
 
+//        actionList.forEach(action -> action.runAction(this));
     }
 
-    private void handleWeatherPhase() {
+    private void runWeatherPhase() {
         AtomicInteger rainCloudsNumber = new AtomicInteger();
         AtomicInteger snowCludsNumber = new AtomicInteger();
         AtomicBoolean beastAttack = new AtomicBoolean(false);
@@ -405,15 +472,15 @@ public class GameEngineController implements GameEndListener {
 
         if (snowCludsNumber.get() > 0) {
             logger.debug("--->Liczba chmur ziomowych: " + snowCludsNumber.get() + ". Za każdą chmurę należy odrzucić 1 drewno.");
-            gameInfo.decreaseWood(snowCludsNumber.get());
+            gameInfo.changeWoodLevel(-snowCludsNumber.get());
         }
 
         int cloudsSum = rainCloudsNumber.get() + snowCludsNumber.get();
         int missingRoofLevel = cloudsSum - gameInfo.getRoofLevel();
         if (missingRoofLevel > 0) {
             logger.debug("--->Liczba wszystkich chmur: " + cloudsSum + ". Za każdy brakujący poziom dachu należy odrzucić 1 drewno i 1 jedzenie.");
-            gameInfo.decreaseWood(missingRoofLevel);
-            gameInfo.decreaseFood(missingRoofLevel, null);
+            gameInfo.changeWoodLevel(-missingRoofLevel);
+            gameInfo.changeFoodLevel(-missingRoofLevel, null);
         }
 
         if (beastAttack.get()) {
@@ -423,24 +490,33 @@ public class GameEngineController implements GameEndListener {
             gameInfo.changePalisadeLevel(-1);
         } else if (foodDiscard.get()) {
             logger.info("--->Należy odrzucić 1 jedzenie!");
-            gameInfo.decreaseFood(1, null);
+            gameInfo.changeFoodLevel(-1, null);
         }
     }
 
-    private void handleNightPhase() {
-        int requiredFood = gameInfo.getCharacters().size();
+    private void runNightPhase() {
+        int requiredFood;
+        if (!isFriday) {
+            requiredFood = gameInfo.getCharacters().size();
+        } else {
+            requiredFood = gameInfo.getCharacters().size() - 1;
+        }
         int foodAmount = gameInfo.getAvaibleResources().getFoodAmount();
-        int longExpiryDateFoodAmount = gameInfo.getAvaibleResources().getLongExpiryDateFoodsAmount();
+        int longExpiryDateFoodAmount = gameInfo.getAvaibleResources().getLongExpiryDateFoodAmount();
         int allFoodAmount = foodAmount + longExpiryDateFoodAmount;
 
         logger.debug("--->Kolacja! Każda postać musi zjeść posiłek...");
-        gameInfo.decreaseFood(requiredFood, chooseStarvingCharacters(requiredFood - allFoodAmount));
+        gameInfo.changeFoodLevel(-requiredFood, chooseStarvingCharacters(requiredFood - allFoodAmount));
 
 //        opcja przeniesienia obozu
         IslandTile camp = gameInfo.getCamp();
         if (!gameInfo.isShelter() && !camp.isHasNaturalShelter()) {
             logger.info("--->Brak schronienia! Tę noc wszyscy spędzą pod gołym niebem!");
-            gameInfo.getCharacters().forEach(character -> character.changeLife(-1));
+            gameInfo.getCharacters().forEach(character -> {
+                if (character instanceof Character) {
+                    character.changeLife(-1);
+                }
+            });
         }
 
         AtomicBoolean canStorageFood = new AtomicBoolean(false);
@@ -463,7 +539,11 @@ public class GameEngineController implements GameEndListener {
         if (value > 1) {
             starvingProfessions = new ArrayList<>();
             List<ProfessionType> notChosenProfessions = new ArrayList<>();
-            gameInfo.getCharacters().forEach(character -> notChosenProfessions.add(character.getProfession()));
+            gameInfo.getCharacters().forEach(character -> {
+                if (character instanceof Character) {
+                    notChosenProfessions.add(((Character) character).getProfession());
+                }
+            });
 
             for (int i = 0; i < value; i++) {
                 String result = showStarvingCharactersAlert(notChosenProfessions);
@@ -522,6 +602,5 @@ public class GameEngineController implements GameEndListener {
         alert.setContentText("Twój wynik to:");
         alert.showAndWait();
     }
-
 
 }

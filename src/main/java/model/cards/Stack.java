@@ -17,5 +17,6 @@ public class Stack {
         this.stack = stack;
     }
 
-
+//TODO
+//    Usunąć stack i zamienić bezpośrednio na linkedList!!!
 }

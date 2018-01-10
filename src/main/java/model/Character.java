@@ -1,6 +1,7 @@
 package model;
 
 import controller.GameEndListener;
+import model.elements.Marker;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 import model.enums.SpecialSkillType;
@@ -21,8 +22,9 @@ public class Character implements ICharacter {
     private int determination;
     private boolean firstPlayer;
     private GameEndListener listener;
+    private List<Marker> characterMarkers;
 
-    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, GameEndListener listener) {
+    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, List<Marker> characterMarkers, GameEndListener listener) {
         this.profession = profession;
         this.sex = sex;
         this.personalInvention = personalInvention;
@@ -31,7 +33,16 @@ public class Character implements ICharacter {
         this.life = life;
         this.determination = 0;
         this.firstPlayer = false;
+        this.characterMarkers = characterMarkers;
         this.listener = listener;
+    }
+
+    public List<Marker> getCharacterMarkers() {
+        return characterMarkers;
+    }
+
+    public void setCharacterMarkers(List<Marker> characterMarkers) {
+        this.characterMarkers = characterMarkers;
     }
 
     public InventionType getPersonalInvention() {
@@ -135,6 +146,7 @@ public class Character implements ICharacter {
         }
     }
 
+    @Override
     public void changeLife(int lives) {
         if (lives < 0) {
             for (int i = life; i >= life + lives; i--) {

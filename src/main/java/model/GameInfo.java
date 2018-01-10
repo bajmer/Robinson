@@ -1,22 +1,28 @@
 package model;
 
-import model.cards.InventionCard;
-import model.cards.IslandTile;
-import model.cards.MysteryTreasureCard;
-import model.cards.StartingItemCard;
+import model.cards.*;
+import model.elements.Marker;
 import model.enums.ProfessionType;
+import model.enums.elements.MarkerType;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import static model.enums.elements.MarkerType.*;
 
 public class GameInfo {
     private static int moraleLevel;
-    private List<Character> characters;
+    private List<ICharacter> characters;
     private List<InventionCard> ideas;
     private List<InventionCard> inventions;
     private List<MysteryTreasureCard> treasures;
     private List<StartingItemCard> startingItems;
     private List<IslandTile> discoveredTiles;
+    private LinkedList<EventCard> threatActionCards;
+    private LinkedList<BeastCard> avaibleBeastCards;
+    private List<Marker> avaibleCharactersMarkers;
+    private List<MarkerType> charactersMarkerTypes;
     private Resources avaibleResources;
     private Resources futureResources;
     private Character firstPlayer;
@@ -27,6 +33,7 @@ public class GameInfo {
     private int weaponLevel;
     private int productionFoodNumber;
     private int productionWoodNumber;
+
     public GameInfo() {
         characters = new ArrayList<>();
         ideas = new ArrayList<>();
@@ -34,6 +41,9 @@ public class GameInfo {
         treasures = new ArrayList<>();
         startingItems = new ArrayList<>();
         discoveredTiles = new ArrayList<>();
+        threatActionCards = new LinkedList<>();
+        avaibleBeastCards = new LinkedList<>();
+        avaibleCharactersMarkers = new ArrayList<>();
         avaibleResources = new Resources();
         futureResources = new Resources();
         isShelter = false;
@@ -43,6 +53,13 @@ public class GameInfo {
         weaponLevel = 0;
         productionFoodNumber = 1;
         productionWoodNumber = 1;
+
+        charactersMarkerTypes = new ArrayList<>();
+        charactersMarkerTypes.add(CARPENTER_MARKER);
+        charactersMarkerTypes.add(COOK_MARKER);
+        charactersMarkerTypes.add(EXPLORER_MARKER);
+        charactersMarkerTypes.add(SOLDIER_MARKER);
+        charactersMarkerTypes.add(FRIDAY_MARKER);
     }
 
     public static int getMoraleLevel() {
@@ -57,6 +74,38 @@ public class GameInfo {
         moraleLevel += moraleChange;
         if (moraleLevel > 3) moraleLevel = 3;
         else if (moraleLevel < -3) moraleLevel = -3;
+    }
+
+    public LinkedList<BeastCard> getAvaibleBeastCards() {
+        return avaibleBeastCards;
+    }
+
+    public void setAvaibleBeastCards(LinkedList<BeastCard> avaibleBeastCards) {
+        this.avaibleBeastCards = avaibleBeastCards;
+    }
+
+    public List<MarkerType> getCharactersMarkerTypes() {
+        return charactersMarkerTypes;
+    }
+
+    public void setCharactersMarkerTypes(List<MarkerType> charactersMarkerTypes) {
+        this.charactersMarkerTypes = charactersMarkerTypes;
+    }
+
+    public List<Marker> getAvaibleCharactersMarkers() {
+        return avaibleCharactersMarkers;
+    }
+
+    public void setAvaibleCharactersMarkers(List<Marker> avaibleCharactersMarkers) {
+        this.avaibleCharactersMarkers = avaibleCharactersMarkers;
+    }
+
+    public LinkedList<EventCard> getThreatActionCards() {
+        return threatActionCards;
+    }
+
+    public void setThreatActionCards(LinkedList<EventCard> threatActionCards) {
+        this.threatActionCards = threatActionCards;
     }
 
     public List<MysteryTreasureCard> getTreasures() {
@@ -139,11 +188,11 @@ public class GameInfo {
         this.weaponLevel = weaponLevel;
     }
 
-    public List<Character> getCharacters() {
+    public List<ICharacter> getCharacters() {
         return characters;
     }
 
-    public void setCharacters(List<Character> characters) {
+    public void setCharacters(List<ICharacter> characters) {
         this.characters = characters;
     }
 
@@ -191,41 +240,41 @@ public class GameInfo {
         characters.forEach(character -> character.changeLife(value));
     }
 
-    public void decreaseWood(int value) {
-        int woodAmount = avaibleResources.getWoodAmount();
-        if (woodAmount >= value) {
-            avaibleResources.setWoodAmount(woodAmount - value);
-        } else {
-            int missingWood = value - woodAmount;
-            avaibleResources.setWoodAmount(0);
-            decreaseLifeForAllCharacters(-missingWood);
-        }
-    }
-
-    public void decreaseFood(int value, List<ProfessionType> starvingProfessions) {
-        int shortExpiryDateFoodAmount = avaibleResources.getFoodAmount();
-        int longExpiryDateFoodAmount = avaibleResources.getLongExpiryDateFoodsAmount();
-        if (shortExpiryDateFoodAmount >= value) {
-            avaibleResources.setFoodAmount(shortExpiryDateFoodAmount - value);
-        } else {
-            int missingLongExpiryFood = value - shortExpiryDateFoodAmount;
+    public void changeFoodLevel(int value, List<ProfessionType> starvingProfessions) {
+        avaibleResources.setFoodAmount(avaibleResources.getFoodAmount() + value);
+        if (avaibleResources.getFoodAmount() < 0) {
+            avaibleResources.setLongExpiryDateFoodAmount(avaibleResources.getLongExpiryDateFoodAmount() + avaibleResources.getFoodAmount());
             avaibleResources.setFoodAmount(0);
-            if (longExpiryDateFoodAmount >= missingLongExpiryFood) {
-                avaibleResources.setLongExpiryDateFoodsAmount(longExpiryDateFoodAmount - missingLongExpiryFood);
-            } else {
-                int missingFood = missingLongExpiryFood - longExpiryDateFoodAmount;
-                avaibleResources.setLongExpiryDateFoodsAmount(0);
+            if (avaibleResources.getLongExpiryDateFoodAmount() < 0) {
                 if (starvingProfessions == null) {
-                    decreaseLifeForAllCharacters(-missingFood);
+                    decreaseLifeForAllCharacters(avaibleResources.getLongExpiryDateFoodAmount());
                 } else {
                     characters.forEach(character -> {
-                        if (starvingProfessions.contains(character.getProfession())) {
-                            character.changeLife(-2);
+                        if (character instanceof Character) {
+                            if (starvingProfessions.contains(((Character) character).getProfession())) {
+                                character.changeLife(-2);
+                            }
                         }
                     });
                 }
-
+                avaibleResources.setLongExpiryDateFoodAmount(0);
             }
+        }
+    }
+
+    public void changeWoodLevel(int value) {
+        avaibleResources.setWoodAmount(avaibleResources.getWoodAmount() + value);
+        if (avaibleResources.getWoodAmount() < 0) {
+            decreaseLifeForAllCharacters(avaibleResources.getWoodAmount());
+            avaibleResources.setWoodAmount(0);
+        }
+    }
+
+    public void changeHideLevel(int value) {
+        avaibleResources.setHideAmount(avaibleResources.getHideAmount() + value);
+        if (avaibleResources.getHideAmount() < 0) {
+            decreaseLifeForAllCharacters(avaibleResources.getHideAmount());
+            avaibleResources.setHideAmount(0);
         }
     }
 

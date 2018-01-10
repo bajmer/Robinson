@@ -1,21 +1,24 @@
 package model.cards;
 
+import model.elements.Marker;
 import model.enums.cards.eventcards.EventEffectType;
 import model.enums.cards.eventcards.EventIconType;
 import model.enums.cards.eventcards.ThreatActionType;
 import model.enums.cards.eventcards.ThreatEffectType;
 
+import java.util.List;
+
 public class EventCard implements Usable {
     private EventEffectType eventEffect;
     private EventIconType eventIcon;
-    private ThreatActionType dangerAction;
-    private ThreatEffectType dangerEffect;
+    private ThreatActionType threatAction;
+    private ThreatEffectType threatEffect;
 
-    public EventCard(EventEffectType eventEffect, EventIconType eventIcon, ThreatActionType dangerAction, ThreatEffectType dangerEffect) {
+    public EventCard(EventEffectType eventEffect, EventIconType eventIcon, ThreatActionType threatAction, ThreatEffectType threatEffect) {
         this.eventEffect = eventEffect;
         this.eventIcon = eventIcon;
-        this.dangerAction = dangerAction;
-        this.dangerEffect = dangerEffect;
+        this.threatAction = threatAction;
+        this.threatEffect = threatEffect;
     }
 
     public EventEffectType getEventEffect() {
@@ -34,24 +37,40 @@ public class EventCard implements Usable {
         this.eventIcon = eventIcon;
     }
 
-    public ThreatActionType getDangerAction() {
-        return dangerAction;
+    public ThreatActionType getThreatAction() {
+        return threatAction;
     }
 
-    public void setDangerAction(ThreatActionType dangerAction) {
-        this.dangerAction = dangerAction;
+    public void setThreatAction(ThreatActionType threatAction) {
+        this.threatAction = threatAction;
     }
 
-    public ThreatEffectType getDangerEffect() {
-        return dangerEffect;
+    public ThreatEffectType getThreatEffect() {
+        return threatEffect;
     }
 
-    public void setDangerEffect(ThreatEffectType dangerEffect) {
-        this.dangerEffect = dangerEffect;
+    public void setThreatEffect(ThreatEffectType threatEffect) {
+        this.threatEffect = threatEffect;
     }
 
     @Override
     public void use() {
+        runEventEffect();
+    }
+
+    private void runEventEffect() {
+
+    }
+
+    public void runThreatAction(List<Marker> markers) {
+        int markersNumber = markers.size();
+        switch (threatAction) {
+            case THREAT_ACTION:
+                break;
+        }
+    }
+
+    public void runThreatEffect() {
 
     }
 }

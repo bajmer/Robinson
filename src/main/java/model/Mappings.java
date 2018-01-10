@@ -1,6 +1,9 @@
 package model;
 
-import model.enums.*;
+import model.enums.PhaseType;
+import model.enums.ProfessionType;
+import model.enums.SpecialSkillType;
+import model.enums.TerrainType;
 import model.enums.cards.BeastType;
 import model.enums.cards.InventionType;
 import model.enums.cards.adventurecards.AdventureEventEffectType;
@@ -11,17 +14,14 @@ import model.enums.cards.eventcards.EventEffectType;
 import model.enums.cards.eventcards.EventIconType;
 import model.enums.cards.eventcards.ThreatActionType;
 import model.enums.cards.eventcards.ThreatEffectType;
-import model.enums.cards.wreckagecards.WreckageEventEffectType;
-import model.enums.cards.wreckagecards.WreckageThreatActionType;
-import model.enums.cards.wreckagecards.WreckageThreatEffectType;
+import model.enums.elements.DiceType;
+import model.enums.elements.MarkerType;
+import model.enums.elements.ResourceType;
 
 import java.util.*;
 
-import static model.enums.DiceType.*;
 import static model.enums.PhaseType.*;
 import static model.enums.ProfessionType.*;
-import static model.enums.ResourceType.FOOD;
-import static model.enums.ResourceType.WOOD;
 import static model.enums.SpecialSkillType.*;
 import static model.enums.TerrainType.*;
 import static model.enums.cards.BeastType.*;
@@ -34,9 +34,10 @@ import static model.enums.cards.eventcards.EventEffectType.*;
 import static model.enums.cards.eventcards.EventIconType.*;
 import static model.enums.cards.eventcards.ThreatActionType.THREAT_ACTION;
 import static model.enums.cards.eventcards.ThreatEffectType.THREAT_EFFECT;
-import static model.enums.cards.wreckagecards.WreckageEventEffectType.*;
-import static model.enums.cards.wreckagecards.WreckageThreatActionType.SOME_WRECKAGE_ACTION;
-import static model.enums.cards.wreckagecards.WreckageThreatEffectType.SOME_WRECKAGE_THREAT_EFFECT;
+import static model.enums.elements.DiceType.*;
+import static model.enums.elements.MarkerType.*;
+import static model.enums.elements.ResourceType.FOOD;
+import static model.enums.elements.ResourceType.WOOD;
 
 public class Mappings {
     private static Map<EventEffectType, EventIconType> eventEffectToEventIconMapping = new HashMap<>();
@@ -61,8 +62,7 @@ public class Mappings {
     private static Map<ProfessionType, InventionType> professionToPersonalInventionMapping = new HashMap<>();
     private static Map<ProfessionType, List<Integer>> professionToMoraleDownMapping = new HashMap<>();
     private static Map<ProfessionType, Integer> professionToLifeMapping = new HashMap<>();
-    private static Map<WreckageEventEffectType, WreckageThreatActionType> wreckageEventToWreckageThreatActionMapping = new HashMap<>();
-    private static Map<WreckageEventEffectType, WreckageThreatEffectType> wreckageEventToWreckageThreatEffectMapping = new HashMap<>();
+    private static Map<ProfessionType, MarkerType> professionToMarkerMapping = new HashMap<>();
     private static Map<Integer, TerrainType> islandTileIdToTerrainMapping = new HashMap<>();
     private static Map<Integer, ResourceType> islandTileIdToLeftSquareResourceMapping = new HashMap<>();
     private static Map<Integer, ResourceType> islandTileIdToRightSquareResourceMapping = new HashMap<>();
@@ -71,7 +71,12 @@ public class Mappings {
     private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
     private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
     private static Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping = new HashMap<>();
+
     public Mappings() {
+
+        eventEffectToEventIconMapping.put(FOOD_CRATES, null);
+        eventEffectToEventIconMapping.put(WRECKED_LIFEBOAT, null);
+        eventEffectToEventIconMapping.put(CAPTAINS_CHEST, null);
         eventEffectToEventIconMapping.put(WINTER_DEPRESSION, BOOK);
         eventEffectToEventIconMapping.put(CHRONIC_TIREDNESS, BOOK);
         eventEffectToEventIconMapping.put(HIGH_WATER, BOOK);
@@ -146,6 +151,9 @@ public class Mappings {
         eventEffectToEventIconMapping.put(RAVENOUS_PREDATORS, BOOK);
         eventEffectToEventIconMapping.put(OTTERS, GATHERING_RESOURCES_ADVENTURE);
 
+        eventEffectToThreatActionMapping.put(FOOD_CRATES, THREAT_ACTION);
+        eventEffectToThreatActionMapping.put(WRECKED_LIFEBOAT, THREAT_ACTION);
+        eventEffectToThreatActionMapping.put(CAPTAINS_CHEST, THREAT_ACTION);
         eventEffectToThreatActionMapping.put(WINTER_DEPRESSION, THREAT_ACTION);
         eventEffectToThreatActionMapping.put(CHRONIC_TIREDNESS, THREAT_ACTION);
         eventEffectToThreatActionMapping.put(HIGH_WATER, THREAT_ACTION);
@@ -220,6 +228,9 @@ public class Mappings {
         eventEffectToThreatActionMapping.put(RAVENOUS_PREDATORS, THREAT_ACTION);
         eventEffectToThreatActionMapping.put(OTTERS, THREAT_ACTION);
 
+        eventEffectToThreatEffectMapping.put(FOOD_CRATES, THREAT_EFFECT);
+        eventEffectToThreatEffectMapping.put(WRECKED_LIFEBOAT, THREAT_EFFECT);
+        eventEffectToThreatEffectMapping.put(CAPTAINS_CHEST, THREAT_EFFECT);
         eventEffectToThreatEffectMapping.put(WINTER_DEPRESSION, THREAT_EFFECT);
         eventEffectToThreatEffectMapping.put(CHRONIC_TIREDNESS, THREAT_EFFECT);
         eventEffectToThreatEffectMapping.put(HIGH_WATER, THREAT_EFFECT);
@@ -494,13 +505,10 @@ public class Mappings {
         professionToLifeMapping.put(EXPLORER, 12);
         professionToLifeMapping.put(SOLDIER, 12);
 
-        wreckageEventToWreckageThreatActionMapping.put(FOOD_CRATES, SOME_WRECKAGE_ACTION);
-        wreckageEventToWreckageThreatActionMapping.put(CAPTAINS_CHEST, SOME_WRECKAGE_ACTION);
-        wreckageEventToWreckageThreatActionMapping.put(WRECKED_LIFEBOAT, SOME_WRECKAGE_ACTION);
-
-        wreckageEventToWreckageThreatEffectMapping.put(FOOD_CRATES, SOME_WRECKAGE_THREAT_EFFECT);
-        wreckageEventToWreckageThreatEffectMapping.put(CAPTAINS_CHEST, SOME_WRECKAGE_THREAT_EFFECT);
-        wreckageEventToWreckageThreatEffectMapping.put(WRECKED_LIFEBOAT, SOME_WRECKAGE_THREAT_EFFECT);
+        professionToMarkerMapping.put(CARPENTER, CARPENTER_MARKER);
+        professionToMarkerMapping.put(COOK, COOK_MARKER);
+        professionToMarkerMapping.put(EXPLORER, EXPLORER_MARKER);
+        professionToMarkerMapping.put(SOLDIER, SOLDIER_MARKER);
 
         islandTileIdToTerrainMapping.put(1, PLAINS);
         islandTileIdToTerrainMapping.put(2, MOUNTAINS);
@@ -593,6 +601,14 @@ public class Mappings {
         currentPhaseToNextPhaseMapping.put(WEATHER_PHASE, NIGHT_PHASE);
         currentPhaseToNextPhaseMapping.put(NIGHT_PHASE, EVENT_PHASE);
 
+    }
+
+    public static Map<ProfessionType, MarkerType> getProfessionToMarkerMapping() {
+        return professionToMarkerMapping;
+    }
+
+    public static void setProfessionToMarkerMapping(Map<ProfessionType, MarkerType> professionToMarkerMapping) {
+        Mappings.professionToMarkerMapping = professionToMarkerMapping;
     }
 
     public static Map<Integer, Map<Integer, List<DiceType>>> getScenarioIdToRoundWeatherDicesMapMapping() {
@@ -729,22 +745,6 @@ public class Mappings {
 
     public static void setProfessionToPersonalInventionMapping(Map<ProfessionType, InventionType> professionToPersonalInventionMapping) {
         Mappings.professionToPersonalInventionMapping = professionToPersonalInventionMapping;
-    }
-
-    public static Map<WreckageEventEffectType, WreckageThreatActionType> getWreckageEventToWreckageThreatActionMapping() {
-        return wreckageEventToWreckageThreatActionMapping;
-    }
-
-    public static void setWreckageEventToWreckageThreatActionMapping(Map<WreckageEventEffectType, WreckageThreatActionType> wreckageEventToWreckageThreatActionMapping) {
-        Mappings.wreckageEventToWreckageThreatActionMapping = wreckageEventToWreckageThreatActionMapping;
-    }
-
-    public static Map<WreckageEventEffectType, WreckageThreatEffectType> getWreckageEventToWreckageThreatEffectMapping() {
-        return wreckageEventToWreckageThreatEffectMapping;
-    }
-
-    public static void setWreckageEventToWreckageThreatEffectMapping(Map<WreckageEventEffectType, WreckageThreatEffectType> wreckageEventToWreckageThreatEffectMapping) {
-        Mappings.wreckageEventToWreckageThreatEffectMapping = wreckageEventToWreckageThreatEffectMapping;
     }
 
     public static Map<ProfessionType, Integer> getProfessionToLifeMapping() {

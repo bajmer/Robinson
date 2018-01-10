@@ -1,7 +1,7 @@
 package model;
 
 import controller.GameEndListener;
-import model.enums.DiceType;
+import model.enums.elements.DiceType;
 
 import java.util.List;
 import java.util.Map;

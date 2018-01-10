@@ -1,7 +1,7 @@
 package model.cards;
 
-import model.enums.ResourceType;
 import model.enums.TerrainType;
+import model.enums.elements.ResourceType;
 
 public class IslandTile implements Usable {
     private int id;

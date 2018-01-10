@@ -3,13 +3,13 @@ package model;
 public class Resources {
     private int woodAmount;
     private int foodAmount;
-    private int longExpiryDateFoodsAmount;
+    private int longExpiryDateFoodAmount;
     private int hideAmount;
 
     public Resources() {
         woodAmount = 0;
         foodAmount = 0;
-        longExpiryDateFoodsAmount = 0;
+        longExpiryDateFoodAmount = 0;
         hideAmount = 0;
     }
 
@@ -29,12 +29,12 @@ public class Resources {
         this.foodAmount = foodAmount;
     }
 
-    public int getLongExpiryDateFoodsAmount() {
-        return longExpiryDateFoodsAmount;
+    public int getLongExpiryDateFoodAmount() {
+        return longExpiryDateFoodAmount;
     }
 
-    public void setLongExpiryDateFoodsAmount(int longExpiryDateFoodsAmount) {
-        this.longExpiryDateFoodsAmount = longExpiryDateFoodsAmount;
+    public void setLongExpiryDateFoodAmount(int longExpiryDateFoodAmount) {
+        this.longExpiryDateFoodAmount = longExpiryDateFoodAmount;
     }
 
     public int getHideAmount() {

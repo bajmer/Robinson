@@ -5,10 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import model.enums.ProfessionType;
 import model.enums.SexType;
-import model.enums.cards.wreckagecards.WreckageEventEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static model.enums.cards.eventcards.EventEffectType.FOOD_CRATES;
 
 public class GameWindowController {
     @FXML
@@ -25,7 +26,6 @@ public class GameWindowController {
         choosedCharacters.put(ProfessionType.EXPLORER, SexType.MAN);
         boolean isFriday = true;
         boolean isDog = true;
-        WreckageEventEffectType wreckageEvent = WreckageEventEffectType.FOOD_CRATES;
         int startingItemsNumber = 2;
 
         gameEngineController = new GameEngineController(
@@ -33,7 +33,7 @@ public class GameWindowController {
                 choosedCharacters,
                 isFriday,
                 isDog,
-                wreckageEvent,
+                FOOD_CRATES,
                 startingItemsNumber);
     }
 

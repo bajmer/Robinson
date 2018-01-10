@@ -1,12 +1,12 @@
-package model;
+package model.elements;
 
-import model.enums.DiceType;
-import model.enums.DiceWallType;
+import model.enums.elements.DiceType;
+import model.enums.elements.DiceWallType;
 
 import java.util.*;
 
-import static model.enums.DiceType.*;
-import static model.enums.DiceWallType.*;
+import static model.enums.elements.DiceType.*;
+import static model.enums.elements.DiceWallType.*;
 
 public class Dices {
 

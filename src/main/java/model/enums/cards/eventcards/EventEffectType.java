@@ -1,6 +1,9 @@
 package model.enums.cards.eventcards;
 
 public enum EventEffectType {
+    FOOD_CRATES,
+    WRECKED_LIFEBOAT,
+    CAPTAINS_CHEST,
     WINTER_DEPRESSION,
     CHRONIC_TIREDNESS,
     HIGH_WATER,
