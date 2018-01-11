@@ -39,15 +39,6 @@ public class GameEngineController implements GameEventsListener {
     private Logger logger = LogManager.getLogger(GameEngineController.class);
     private GameWindowController gameWindowController;
     private Scenario scenario;
-    private LinkedList<InventionCard> inventionCardsDeck;
-    private LinkedList<EventCard> eventStackDeck;
-    private LinkedList<BuildingAdventureCard> buildingAdventureCardsDeck;
-    private LinkedList<GatheringResourcesAdventureCard> gatheringResourcesAdventureCardsDeck;
-    private LinkedList<ExplorationAdventureCard> explorationAdventureCardsDeck;
-    private LinkedList<BeastCard> beastCardsDeck;
-    private LinkedList<Usable> mysteryCardsDeck;
-    private LinkedList<IslandTile> islandTilesStack;
-    private LinkedList<DiscoveryToken> discoveryTokensStack;
     private Board board;
     private PhaseType phase;
     private Dices dices;
@@ -145,13 +136,12 @@ public class GameEngineController implements GameEventsListener {
         });
         Collections.shuffle(allEventsStack);
 
-        eventStackDeck = new LinkedList<>();
         int bookIconsCounter = 0;
         int questionmarkIconsCouter = 0;
 
         for (EventCard card : allEventsStack) {
             if (card.getEventIcon() == BOOK && bookIconsCounter < scenario.getRoundsNumber() / 2) {
-                eventStackDeck.add(card);
+                Decks.getEventStackDeck().add(card);
                 bookIconsCounter++;
                 continue;
             }
@@ -159,7 +149,7 @@ public class GameEngineController implements GameEventsListener {
                     card.getEventIcon() == GATHERING_RESOURCES_ADVENTURE ||
                     card.getEventIcon() == EXPLORATION_ADVENTURE) &&
                     questionmarkIconsCouter < scenario.getRoundsNumber() / 2) {
-                eventStackDeck.add(card);
+                Decks.getEventStackDeck().add(card);
                 questionmarkIconsCouter++;
             }
         }
@@ -170,7 +160,7 @@ public class GameEngineController implements GameEventsListener {
         wreckageEvents.add(CAPTAINS_CHEST);
         EventEffectType wreckageEvent = wreckageEvents.get(new Random().nextInt(wreckageEvents.size()));
 
-        eventStackDeck.addFirst(new EventCard(
+        Decks.getEventStackDeck().addFirst(new EventCard(
                 wreckageEvent,
                 Mappings.getEventEffectToEventIconMapping().get(wreckageEvent),
                 Mappings.getEventEffectToThreatActionMapping().get(wreckageEvent),
@@ -187,7 +177,6 @@ public class GameEngineController implements GameEventsListener {
                 Mappings.getInventionToIsMandatoryMapping().get(inventionType),
                 Mappings.getInventionToOwnerMapping().get(inventionType))));
 
-        inventionCardsDeck = new LinkedList<>();
         for (Usable card : allInventionsStack) {
             InventionCard inventionCard = (InventionCard) card;
             if (inventionCard.isMandatory()) {
@@ -195,7 +184,7 @@ public class GameEngineController implements GameEventsListener {
             } else {
                 ProfessionType owner = inventionCard.getOwner();
                 if (owner == null) {
-                    inventionCardsDeck.add(inventionCard);
+                    Decks.getInventionCardsDeck().add(inventionCard);
                 } else {
                     boolean characterEqualsOwner = false;
                     for (ICharacter character : GameInfo.getCharacters()) {
@@ -208,15 +197,15 @@ public class GameEngineController implements GameEventsListener {
                     if (characterEqualsOwner) {
                         GameInfo.getIdeas().add(inventionCard);
                     } else {
-                        inventionCardsDeck.add(inventionCard);
+                        Decks.getInventionCardsDeck().add(inventionCard);
                     }
                 }
             }
         }
 
-        Collections.shuffle(inventionCardsDeck);
+        Collections.shuffle(Decks.getInventionCardsDeck());
         for (int i = 0; i < 5; i++) {
-            GameInfo.getIdeas().add(inventionCardsDeck.removeFirst());
+            GameInfo.getIdeas().add(Decks.getInventionCardsDeck().removeFirst());
         }
         logger.info("Wylosowano karty pomysłow.");
         for (InventionCard invention : GameInfo.getIdeas()) {
@@ -225,45 +214,39 @@ public class GameEngineController implements GameEventsListener {
     }
 
     private void createAdventureCardsDecks() {
-        buildingAdventureCardsDeck = new LinkedList<>();
-        Arrays.asList(BuildingAdventureType.values()).forEach(adventureType -> buildingAdventureCardsDeck.add(
+        Arrays.asList(BuildingAdventureType.values()).forEach(adventureType -> Decks.getBuildingAdventureCardsDeck().add(
                 new BuildingAdventureCard(adventureType, Mappings.getBuildingAdvntureToAdventureEventEffectMapping().get(adventureType))));
-        Collections.shuffle(buildingAdventureCardsDeck);
+        Collections.shuffle(Decks.getBuildingAdventureCardsDeck());
 
-        gatheringResourcesAdventureCardsDeck = new LinkedList<>();
-        Arrays.asList(GatheringResourcesAdventureType.values()).forEach(adventureType -> gatheringResourcesAdventureCardsDeck.add(
+        Arrays.asList(GatheringResourcesAdventureType.values()).forEach(adventureType -> Decks.getGatheringResourcesAdventureCardsDeck().add(
                 new GatheringResourcesAdventureCard(adventureType, Mappings.getGatheringAdventureToAdventureEventEffectMapping().get(adventureType))));
-        Collections.shuffle(gatheringResourcesAdventureCardsDeck);
+        Collections.shuffle(Decks.getGatheringResourcesAdventureCardsDeck());
 
-        explorationAdventureCardsDeck = new LinkedList<>();
-        Arrays.asList(ExplorationAdventureType.values()).forEach(adventureType -> explorationAdventureCardsDeck.add(
+        Arrays.asList(ExplorationAdventureType.values()).forEach(adventureType -> Decks.getExplorationAdventureCardsDeck().add(
                 new ExplorationAdventureCard(adventureType, Mappings.getExplorationAdventureToAdventureEventEffectMapping().get(adventureType))));
-        Collections.shuffle(explorationAdventureCardsDeck);
+        Collections.shuffle(Decks.getExplorationAdventureCardsDeck());
         logger.info("Przygotowano talie przygód.");
     }
 
     private void createHountingCardsDeck() {
-        beastCardsDeck = new LinkedList<>();
-        Arrays.asList(BeastType.values()).forEach(beastType -> beastCardsDeck.add(new BeastCard(
+        Arrays.asList(BeastType.values()).forEach(beastType -> Decks.getBeastCardsDeck().add(new BeastCard(
                 beastType, Mappings.getBeastToBeastStatsMapping().get(beastType))));
-        Collections.shuffle(beastCardsDeck);
+        Collections.shuffle(Decks.getBeastCardsDeck());
         logger.info("Przygotowano talię bestii.");
     }
 
     private void createMysteryCardsDeck() {
-        mysteryCardsDeck = new LinkedList<>();
-        Arrays.asList(MysteryTreasureType.values()).forEach(mysteryType -> mysteryCardsDeck.add(new MysteryTreasureCard(mysteryType)));
-        Arrays.asList(MysteryMonsterType.values()).forEach(mysteryType -> mysteryCardsDeck.add(new MysteryMonsterCard(mysteryType)));
-        Arrays.asList(MysteryTrapType.values()).forEach(mysteryType -> mysteryCardsDeck.add(new MysteryTrapCard(mysteryType)));
-        Collections.shuffle(mysteryCardsDeck);
+        Arrays.asList(MysteryTreasureType.values()).forEach(mysteryType -> Decks.getMysteryCardsDeck().add(new MysteryTreasureCard(mysteryType)));
+        Arrays.asList(MysteryMonsterType.values()).forEach(mysteryType -> Decks.getMysteryCardsDeck().add(new MysteryMonsterCard(mysteryType)));
+        Arrays.asList(MysteryTrapType.values()).forEach(mysteryType -> Decks.getMysteryCardsDeck().add(new MysteryTrapCard(mysteryType)));
+        Collections.shuffle(Decks.getMysteryCardsDeck());
         logger.info("Przygotowano talię tajemnic.");
     }
 
     private void createDiscoveryTokensStack() {
-        discoveryTokensStack = new LinkedList<>();
-        Arrays.asList(DiscoveryTokenType.values()).forEach(discoveryToken -> discoveryTokensStack.add(
+        Arrays.asList(DiscoveryTokenType.values()).forEach(discoveryToken -> Decks.getDiscoveryTokensStack().add(
                 new DiscoveryToken(discoveryToken)));
-        Collections.shuffle(discoveryTokensStack);
+        Collections.shuffle(Decks.getDiscoveryTokensStack());
         logger.info("Utworzono stos żetonów odkryć.");
     }
 
@@ -283,7 +266,6 @@ public class GameEngineController implements GameEventsListener {
     }
 
     private void createIslandTilesStack() {
-        islandTilesStack = new LinkedList<>();
         for (int i = 1; i <= 11; i++) {
             IslandTile islandTile = new IslandTile(
                     i,
@@ -296,15 +278,14 @@ public class GameEngineController implements GameEventsListener {
                     Mappings.getIslandTileIdToHasNaturalShelterMapping().get(i));
 
             if (i != 8) {
-                islandTilesStack.add(islandTile);
+                Decks.getIslandTilesStack().add(islandTile);
             } else {
                 GameInfo.getDiscoveredTiles().add(islandTile);
                 board.getTilePositionIdToIslandTile().put(1, islandTile);
                 GameInfo.setCamp(islandTile);
             }
         }
-
-        Collections.shuffle(islandTilesStack);
+        Collections.shuffle(Decks.getIslandTilesStack());
 
         logger.info("Przygotowano stos kafelków wyspy.");
     }
@@ -366,7 +347,7 @@ public class GameEngineController implements GameEventsListener {
     }
 
     private void runEventPhase() {
-        EventCard card = eventStackDeck.removeFirst();
+        EventCard card = Decks.getEventStackDeck().removeFirst();
         logger.info("--->Wydarzenie: " + card.getEventEffect());
         card.use();
 
@@ -409,7 +390,7 @@ public class GameEngineController implements GameEventsListener {
     private void runActionPhase() {
 //        przygotowanie
 
-//        actionList.forEach(action -> action.runAction());
+//        actionList.forEach(Action::runAction);
     }
 
     private void runWeatherPhase() {
@@ -422,7 +403,7 @@ public class GameEngineController implements GameEventsListener {
         Mappings.getScenarioIdToRoundWeatherDicesMapMapping().get(scenario.getId()).get(scenario.getRound()).forEach(
                 diceType -> {
                     DiceWallType result = dices.roll(dices.getDiceTypeToDiceMapping().get(diceType));
-                    logger.info("--->Rzut kostką " + diceType + ". Wynik: " + result);
+                    logger.info("--->Rzut kością pogody " + diceType + ". Wynik: " + result);
                     switch (result) {
                         case SINGLE_RAIN:
                             rainCloudsNumber.getAndIncrement();
@@ -444,6 +425,8 @@ public class GameEngineController implements GameEventsListener {
                             break;
                         case FOOD_DISCARD:
                             foodDiscard.set(true);
+                            break;
+                        case NOTHING:
                             break;
                     }
                 }

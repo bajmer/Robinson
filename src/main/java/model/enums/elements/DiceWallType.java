@@ -1,7 +1,7 @@
 package model.enums.elements;
 
 public enum DiceWallType {
-    NULL,
+    NOTHING,
     SUCCESS,
     DETERMINATION,
     ADVENTURE,

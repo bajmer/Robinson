@@ -43,11 +43,11 @@ public class Dices {
         weatherSnowDice.add(DOUBLE_SNOW);
 
         weatherHungryAnimalsDice = new ArrayList<>();
-        weatherHungryAnimalsDice.add(BEAST_ATTACK);
+        weatherHungryAnimalsDice.add(NOTHING);
+        weatherHungryAnimalsDice.add(NOTHING);
         weatherHungryAnimalsDice.add(BEAST_ATTACK);
         weatherHungryAnimalsDice.add(PALISADE_DAMAGE);
         weatherHungryAnimalsDice.add(PALISADE_DAMAGE);
-        weatherHungryAnimalsDice.add(FOOD_DISCARD);
         weatherHungryAnimalsDice.add(FOOD_DISCARD);
 
         diceTypeToDiceMapping = new HashMap<>();

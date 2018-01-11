@@ -46,6 +46,7 @@ public class GameInfo {
     }
 
     public static void changeMoraleLevel(int value) {
+        int beginMoraleLevel = moraleLevel;
         moraleLevel += value;
         if (moraleLevel > 3) {
             moraleLevel = 3;
@@ -53,7 +54,9 @@ public class GameInfo {
             moraleLevel = -3;
         }
 
-        logger.info("Zmiana morale! Teraz wynosi: " + moraleLevel);
+        if (moraleLevel != beginMoraleLevel) {
+            logger.info("Zmiana morale! Teraz wynosi: " + moraleLevel);
+        }
     }
 
     public static void changeFoodLevel(int value, List<ProfessionType> starvingProfessions) {
