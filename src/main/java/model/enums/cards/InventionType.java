@@ -30,5 +30,16 @@ public enum InventionType {
     SACK,
     SHIELD,
     SLING,
-    WALL
+    WALL,
+    HATCHET,
+    MAST,
+    SACRED_BELL,
+    CROSS,
+    JENNY_RAFT,
+    LIFEBOAT,
+    BALLISTA,
+    CANOE,
+    GARDEN,
+    TRAP,
+    TRANSQUELEZER
 }

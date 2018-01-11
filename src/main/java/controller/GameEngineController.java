@@ -172,13 +172,25 @@ public class GameEngineController implements GameEventsListener {
 
     private void createInventionCardsDeck() {
         LinkedList<InventionCard> allInventionsStack = new LinkedList<>();
-        Arrays.asList(InventionType.values()).forEach(inventionType -> allInventionsStack.add(new InventionCard(
-                inventionType,
-                Mappings.getInventionToIsMandatoryMapping().get(inventionType),
-                Mappings.getInventionToOwnerMapping().get(inventionType))));
+        Arrays.asList(InventionType.values()).forEach(inventionType -> {
+            AtomicBoolean scenarioInvention = new AtomicBoolean(false);
+            Mappings.getScenarioIdToInventionMapping().values().forEach(inventionTypes -> {
+                if (inventionTypes.contains(inventionType)) {
+                    scenarioInvention.set(true);
+                }
+            });
 
-        for (Usable card : allInventionsStack) {
-            InventionCard inventionCard = (InventionCard) card;
+            if (!scenarioInvention.get()) {
+                allInventionsStack.add(new InventionCard(
+                        inventionType,
+                        Mappings.getInventionToIsMandatoryMapping().get(inventionType),
+                        Mappings.getInventionToOwnerMapping().get(inventionType),
+                        Mappings.getInventionToMultipleInventionMapping().get(inventionType)
+                ));
+            }
+        });
+
+        for (InventionCard inventionCard : allInventionsStack) {
             if (inventionCard.isMandatory()) {
                 GameInfo.getIdeas().add(inventionCard);
             } else {
@@ -207,6 +219,13 @@ public class GameEngineController implements GameEventsListener {
         for (int i = 0; i < 5; i++) {
             GameInfo.getIdeas().add(Decks.getInventionCardsDeck().removeFirst());
         }
+        Mappings.getScenarioIdToInventionMapping().get(scenario.getId()).forEach(inventionType -> GameInfo.getIdeas().add(
+                new InventionCard(inventionType,
+                        false,
+                        null,
+                        Mappings.getInventionToMultipleInventionMapping().get(inventionType))
+        ));
+
         logger.info("Wylosowano karty pomysłow.");
         for (InventionCard invention : GameInfo.getIdeas()) {
             logger.debug(invention);
@@ -260,7 +279,7 @@ public class GameEngineController implements GameEventsListener {
             GameInfo.getStartingItems().add(startingItemStack.removeFirst());
         }
         logger.info("Wylosowano przedmioty startowe.");
-        for (Usable card : GameInfo.getStartingItems()) {
+        for (StartingItemCard card : GameInfo.getStartingItems()) {
             logger.debug(card);
         }
     }

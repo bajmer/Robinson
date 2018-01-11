@@ -56,7 +56,9 @@ public class Mappings {
     private static Map<Integer, List<DiceType>> scenario5RoundIdToWeatherDicesList = new HashMap<>();
     private static Map<Integer, List<DiceType>> scenario6RoundIdToWeatherDicesList = new HashMap<>();
     private static Map<Integer, List<DiceType>> scenario7RoundIdToWeatherDicesList = new HashMap<>();
+    private static Map<Integer, List<InventionType>> scenarioIdToInventionMapping = new HashMap<>();
     private static Map<InventionType, Boolean> inventionToIsMandatoryMapping = new HashMap<>();
+    private static Map<InventionType, Boolean> inventionToMultipleInventionMapping = new HashMap<>();
     private static Map<InventionType, ProfessionType> inventionToOwnerMapping = new HashMap<>();
     private static Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping = new HashMap<>();
     private static Map<ProfessionType, InventionType> professionToPersonalInventionMapping = new HashMap<>();
@@ -71,7 +73,6 @@ public class Mappings {
     private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
     private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
     private static Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping = new HashMap<>();
-
     public Mappings() {
 
         eventEffectToEventIconMapping.put(FOOD_CRATES, null);
@@ -444,6 +445,14 @@ public class Mappings {
         scenario1RoundIdToWeatherDicesList.put(11, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
         scenario1RoundIdToWeatherDicesList.put(12, new ArrayList<>(Arrays.asList(RAIN_CLOUD_DICE, SNOW_CLOUD_DICE, HUNGRY_ANIMALS_DICE)));
 
+        scenarioIdToInventionMapping.put(1, new ArrayList<>(Arrays.asList(HATCHET, MAST)));
+        scenarioIdToInventionMapping.put(2, new ArrayList<>(Arrays.asList(SACRED_BELL, CROSS)));
+        scenarioIdToInventionMapping.put(3, new ArrayList<>(Arrays.asList(JENNY_RAFT, LIFEBOAT)));
+        scenarioIdToInventionMapping.put(4, new ArrayList<>(Arrays.asList(null, null)));
+        scenarioIdToInventionMapping.put(5, new ArrayList<>(Arrays.asList(BALLISTA, CANOE)));
+        scenarioIdToInventionMapping.put(6, new ArrayList<>(Arrays.asList(GARDEN, null)));
+        scenarioIdToInventionMapping.put(7, new ArrayList<>(Arrays.asList(TRAP, TRANSQUELEZER)));
+
         inventionToIsMandatoryMapping.put(BOW, true);
         inventionToIsMandatoryMapping.put(BRICKS, true);
         inventionToIsMandatoryMapping.put(DAM, true);
@@ -479,6 +488,48 @@ public class Mappings {
         inventionToOwnerMapping.put(FIREPLACE, COOK);
         inventionToOwnerMapping.put(SHORTCUT, EXPLORER);
         inventionToOwnerMapping.put(SPEAR, SOLDIER);
+
+        inventionToMultipleInventionMapping.put(BOW, false);
+        inventionToMultipleInventionMapping.put(BRICKS, false);
+        inventionToMultipleInventionMapping.put(DAM, false);
+        inventionToMultipleInventionMapping.put(InventionType.FIRE, false);
+        inventionToMultipleInventionMapping.put(KNIFE, false);
+        inventionToMultipleInventionMapping.put(MAP, false);
+        inventionToMultipleInventionMapping.put(POT, false);
+        inventionToMultipleInventionMapping.put(ROPE, false);
+        inventionToMultipleInventionMapping.put(SHOVEL, false);
+        inventionToMultipleInventionMapping.put(BASKET, false);
+        inventionToMultipleInventionMapping.put(BED, false);
+        inventionToMultipleInventionMapping.put(BELTS, false);
+        inventionToMultipleInventionMapping.put(CELLAR, false);
+        inventionToMultipleInventionMapping.put(CORRAL, false);
+        inventionToMultipleInventionMapping.put(CURE, false);
+        inventionToMultipleInventionMapping.put(DIARY, false);
+        inventionToMultipleInventionMapping.put(DRUMS, false);
+        inventionToMultipleInventionMapping.put(FIREPLACE, false);
+        inventionToMultipleInventionMapping.put(FURNACE, false);
+        inventionToMultipleInventionMapping.put(LANTERN, false);
+        inventionToMultipleInventionMapping.put(MOAT, false);
+        inventionToMultipleInventionMapping.put(PIT, false);
+        inventionToMultipleInventionMapping.put(RAFT, false);
+        inventionToMultipleInventionMapping.put(SACK, false);
+        inventionToMultipleInventionMapping.put(SHIELD, false);
+        inventionToMultipleInventionMapping.put(SHORTCUT, false);
+        inventionToMultipleInventionMapping.put(SLING, false);
+        inventionToMultipleInventionMapping.put(SNARE, false);
+        inventionToMultipleInventionMapping.put(SPEAR, false);
+        inventionToMultipleInventionMapping.put(WALL, false);
+        inventionToMultipleInventionMapping.put(HATCHET, false);
+        inventionToMultipleInventionMapping.put(MAST, false);
+        inventionToMultipleInventionMapping.put(SACRED_BELL, true);
+        inventionToMultipleInventionMapping.put(CROSS, true);
+        inventionToMultipleInventionMapping.put(JENNY_RAFT, false);
+        inventionToMultipleInventionMapping.put(LIFEBOAT, false);
+        inventionToMultipleInventionMapping.put(BALLISTA, false);
+        inventionToMultipleInventionMapping.put(CANOE, false);
+        inventionToMultipleInventionMapping.put(GARDEN, false);
+        inventionToMultipleInventionMapping.put(TRAP, true);
+        inventionToMultipleInventionMapping.put(TRANSQUELEZER, false);
 
 
         professionToSpecialSkillMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(
@@ -601,6 +652,22 @@ public class Mappings {
         currentPhaseToNextPhaseMapping.put(WEATHER_PHASE, NIGHT_PHASE);
         currentPhaseToNextPhaseMapping.put(NIGHT_PHASE, EVENT_PHASE);
 
+    }
+
+    public static Map<InventionType, Boolean> getInventionToMultipleInventionMapping() {
+        return inventionToMultipleInventionMapping;
+    }
+
+    public static void setInventionToMultipleInventionMapping(Map<InventionType, Boolean> inventionToMultipleInventionMapping) {
+        Mappings.inventionToMultipleInventionMapping = inventionToMultipleInventionMapping;
+    }
+
+    public static Map<Integer, List<InventionType>> getScenarioIdToInventionMapping() {
+        return scenarioIdToInventionMapping;
+    }
+
+    public static void setScenarioIdToInventionMapping(Map<Integer, List<InventionType>> scenarioIdToInventionMapping) {
+        Mappings.scenarioIdToInventionMapping = scenarioIdToInventionMapping;
     }
 
     public static Map<ProfessionType, MarkerType> getProfessionToMarkerMapping() {

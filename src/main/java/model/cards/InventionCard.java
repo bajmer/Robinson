@@ -9,17 +9,27 @@ public class InventionCard implements Usable {
     private boolean isMandatory;
     private boolean isIdea;
     private ProfessionType owner;
+    private boolean multipleIdea;
     private TerrainType requiredTerrain;
     private InventionCard requiredItem;
     private int requiredWoods;
     private int requiredHides;
 
-    public InventionCard(InventionType invention, boolean isMandatory, ProfessionType owner) {
+    public InventionCard(InventionType invention, boolean isMandatory, ProfessionType owner, boolean multipleIdea) {
         this.invention = invention;
         this.isMandatory = isMandatory;
         this.owner = owner;
+        this.multipleIdea = multipleIdea;
 
         this.isIdea = true;
+    }
+
+    public boolean isMultipleIdea() {
+        return multipleIdea;
+    }
+
+    public void setMultipleIdea(boolean multipleIdea) {
+        this.multipleIdea = multipleIdea;
     }
 
     public ProfessionType getOwner() {
