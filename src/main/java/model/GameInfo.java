@@ -3,244 +3,60 @@ package model;
 import model.cards.*;
 import model.elements.Marker;
 import model.enums.ProfessionType;
-import model.enums.elements.MarkerType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static model.enums.elements.MarkerType.*;
-
 public class GameInfo {
-    private static int moraleLevel;
-    private List<ICharacter> characters;
-    private List<InventionCard> ideas;
-    private List<InventionCard> inventions;
-    private List<MysteryTreasureCard> treasures;
-    private List<StartingItemCard> startingItems;
-    private List<IslandTile> discoveredTiles;
-    private LinkedList<EventCard> threatActionCards;
-    private LinkedList<BeastCard> avaibleBeastCards;
-    private List<Marker> avaibleCharactersMarkers;
-    private List<MarkerType> charactersMarkerTypes;
-    private Resources avaibleResources;
-    private Resources futureResources;
-    private Character firstPlayer;
-    private IslandTile camp;
-    private boolean isShelter;
-    private int roofLevel;
-    private int palisadeLevel;
-    private int weaponLevel;
-    private int productionFoodNumber;
-    private int productionWoodNumber;
+    private static Logger logger = LogManager.getLogger(GameInfo.class);
+
+    private static List<ICharacter> characters = new ArrayList<>();
+    private static List<InventionCard> ideas = new ArrayList<>();
+    private static List<InventionCard> inventions = new ArrayList<>();
+    private static List<MysteryTreasureCard> treasures = new ArrayList<>();
+    private static List<StartingItemCard> startingItems = new ArrayList<>();
+    private static List<IslandTile> discoveredTiles = new ArrayList<>();
+    private static LinkedList<EventCard> threatActionCards = new LinkedList<>();
+    private static LinkedList<BeastCard> avaibleBeastCards = new LinkedList<>();
+    private static List<Marker> avaibleCharacterMarkers = new ArrayList<>();
+    private static Resources avaibleResources = new Resources();
+    private static Resources futureResources = new Resources();
+    private static Character firstPlayer;
+    private static IslandTile camp;
+    private static boolean shelter = false;
+    private static int moraleLevel = 0;
+    private static int roofLevel = 0;
+    private static int palisadeLevel = 0;
+    private static int weaponLevel = 0;
+    private static int productionFoodNumber = 1;
+    private static int productionWoodNumber = 1;
 
     public GameInfo() {
-        characters = new ArrayList<>();
-        ideas = new ArrayList<>();
-        inventions = new ArrayList<>();
-        treasures = new ArrayList<>();
-        startingItems = new ArrayList<>();
-        discoveredTiles = new ArrayList<>();
-        threatActionCards = new LinkedList<>();
-        avaibleBeastCards = new LinkedList<>();
-        avaibleCharactersMarkers = new ArrayList<>();
-        avaibleResources = new Resources();
-        futureResources = new Resources();
-        isShelter = false;
-        moraleLevel = 0;
-        roofLevel = 0;
-        palisadeLevel = 0;
-        weaponLevel = 0;
-        productionFoodNumber = 1;
-        productionWoodNumber = 1;
-
-        charactersMarkerTypes = new ArrayList<>();
-        charactersMarkerTypes.add(CARPENTER_MARKER);
-        charactersMarkerTypes.add(COOK_MARKER);
-        charactersMarkerTypes.add(EXPLORER_MARKER);
-        charactersMarkerTypes.add(SOLDIER_MARKER);
-        charactersMarkerTypes.add(FRIDAY_MARKER);
     }
 
-    public static int getMoraleLevel() {
-        return moraleLevel;
+    private static void decreaseLifeForAllCharacters(int value) {
+        characters.forEach(character -> {
+            if (character instanceof Character) {
+                character.changeLife(value);
+            }
+        });
     }
 
-    public static void setMoraleLevel(int moraleLevel) {
-        GameInfo.moraleLevel = moraleLevel;
+    public static void changeMoraleLevel(int value) {
+        moraleLevel += value;
+        if (moraleLevel > 3) {
+            moraleLevel = 3;
+        } else if (moraleLevel < -3) {
+            moraleLevel = -3;
+        }
+
+        logger.info("Zmiana morale! Teraz wynosi: " + moraleLevel);
     }
 
-    public static void changeMoraleLevel(int moraleChange) {
-        moraleLevel += moraleChange;
-        if (moraleLevel > 3) moraleLevel = 3;
-        else if (moraleLevel < -3) moraleLevel = -3;
-    }
-
-    public LinkedList<BeastCard> getAvaibleBeastCards() {
-        return avaibleBeastCards;
-    }
-
-    public void setAvaibleBeastCards(LinkedList<BeastCard> avaibleBeastCards) {
-        this.avaibleBeastCards = avaibleBeastCards;
-    }
-
-    public List<MarkerType> getCharactersMarkerTypes() {
-        return charactersMarkerTypes;
-    }
-
-    public void setCharactersMarkerTypes(List<MarkerType> charactersMarkerTypes) {
-        this.charactersMarkerTypes = charactersMarkerTypes;
-    }
-
-    public List<Marker> getAvaibleCharactersMarkers() {
-        return avaibleCharactersMarkers;
-    }
-
-    public void setAvaibleCharactersMarkers(List<Marker> avaibleCharactersMarkers) {
-        this.avaibleCharactersMarkers = avaibleCharactersMarkers;
-    }
-
-    public LinkedList<EventCard> getThreatActionCards() {
-        return threatActionCards;
-    }
-
-    public void setThreatActionCards(LinkedList<EventCard> threatActionCards) {
-        this.threatActionCards = threatActionCards;
-    }
-
-    public List<MysteryTreasureCard> getTreasures() {
-        return treasures;
-    }
-
-    public void setTreasures(List<MysteryTreasureCard> treasures) {
-        this.treasures = treasures;
-    }
-
-    public int getProductionFoodNumber() {
-        return productionFoodNumber;
-    }
-
-    public void setProductionFoodNumber(int productionFoodNumber) {
-        this.productionFoodNumber = productionFoodNumber;
-    }
-
-    public int getProductionWoodNumber() {
-        return productionWoodNumber;
-    }
-
-    public void setProductionWoodNumber(int productionWoodNumber) {
-        this.productionWoodNumber = productionWoodNumber;
-    }
-
-    public List<IslandTile> getDiscoveredTiles() {
-        return discoveredTiles;
-    }
-
-    public void setDiscoveredTiles(List<IslandTile> discoveredTiles) {
-        this.discoveredTiles = discoveredTiles;
-    }
-
-    public Character getFirstPlayer() {
-        return firstPlayer;
-    }
-
-    public void setFirstPlayer(Character firstPlayer) {
-        this.firstPlayer = firstPlayer;
-    }
-
-    public IslandTile getCamp() {
-        return camp;
-    }
-
-    public void setCamp(IslandTile camp) {
-        this.camp = camp;
-    }
-
-    public boolean isShelter() {
-        return isShelter;
-    }
-
-    public void setShelter(boolean shelter) {
-        isShelter = shelter;
-    }
-
-    public int getRoofLevel() {
-        return roofLevel;
-    }
-
-    public void setRoofLevel(int roofLevel) {
-        this.roofLevel = roofLevel;
-    }
-
-    public int getPalisadeLevel() {
-        return palisadeLevel;
-    }
-
-    public void setPalisadeLevel(int palisadeLevel) {
-        this.palisadeLevel = palisadeLevel;
-    }
-
-    public int getWeaponLevel() {
-        return weaponLevel;
-    }
-
-    public void setWeaponLevel(int weaponLevel) {
-        this.weaponLevel = weaponLevel;
-    }
-
-    public List<ICharacter> getCharacters() {
-        return characters;
-    }
-
-    public void setCharacters(List<ICharacter> characters) {
-        this.characters = characters;
-    }
-
-    public Resources getAvaibleResources() {
-        return avaibleResources;
-    }
-
-    public void setAvaibleResources(Resources avaibleResources) {
-        this.avaibleResources = avaibleResources;
-    }
-
-    public Resources getFutureResources() {
-        return futureResources;
-    }
-
-    public void setFutureResources(Resources futureResources) {
-        this.futureResources = futureResources;
-    }
-
-    public List<InventionCard> getIdeas() {
-        return ideas;
-    }
-
-    public void setIdeas(List<InventionCard> ideas) {
-        this.ideas = ideas;
-    }
-
-    public List<InventionCard> getInventions() {
-        return inventions;
-    }
-
-    public void setInventions(List<InventionCard> inventions) {
-        this.inventions = inventions;
-    }
-
-    public List<StartingItemCard> getStartingItems() {
-        return startingItems;
-    }
-
-    public void setStartingItems(List<StartingItemCard> startingItems) {
-        this.startingItems = startingItems;
-    }
-
-    private void decreaseLifeForAllCharacters(int value) {
-        characters.forEach(character -> character.changeLife(value));
-    }
-
-    public void changeFoodLevel(int value, List<ProfessionType> starvingProfessions) {
+    public static void changeFoodLevel(int value, List<ProfessionType> starvingProfessions) {
         avaibleResources.setFoodAmount(avaibleResources.getFoodAmount() + value);
         if (avaibleResources.getFoodAmount() < 0) {
             avaibleResources.setLongExpiryDateFoodAmount(avaibleResources.getLongExpiryDateFoodAmount() + avaibleResources.getFoodAmount());
@@ -262,7 +78,7 @@ public class GameInfo {
         }
     }
 
-    public void changeWoodLevel(int value) {
+    public static void changeWoodLevel(int value) {
         avaibleResources.setWoodAmount(avaibleResources.getWoodAmount() + value);
         if (avaibleResources.getWoodAmount() < 0) {
             decreaseLifeForAllCharacters(avaibleResources.getWoodAmount());
@@ -270,7 +86,7 @@ public class GameInfo {
         }
     }
 
-    public void changeHideLevel(int value) {
+    public static void changeHideLevel(int value) {
         avaibleResources.setHideAmount(avaibleResources.getHideAmount() + value);
         if (avaibleResources.getHideAmount() < 0) {
             decreaseLifeForAllCharacters(avaibleResources.getHideAmount());
@@ -278,7 +94,7 @@ public class GameInfo {
         }
     }
 
-    public void changePalisadeLevel(int value) {
+    public static void changePalisadeLevel(int value) {
         palisadeLevel += value;
         if (palisadeLevel < 0) {
             decreaseLifeForAllCharacters(palisadeLevel);
@@ -286,7 +102,7 @@ public class GameInfo {
         }
     }
 
-    public void changeRoofLevel(int value) {
+    public static void changeRoofLevel(int value) {
         roofLevel += value;
         if (roofLevel < 0) {
             decreaseLifeForAllCharacters(roofLevel);
@@ -294,11 +110,171 @@ public class GameInfo {
         }
     }
 
-    public void changeWeaponLevel(int value) {
+    public static void changeWeaponLevel(int value) {
         weaponLevel += value;
         if (weaponLevel < 0) {
             decreaseLifeForAllCharacters(weaponLevel);
             weaponLevel = 0;
         }
+    }
+
+    public static int getMoraleLevel() {
+        return moraleLevel;
+    }
+
+    public static void setMoraleLevel(int moraleLevel) {
+        GameInfo.moraleLevel = moraleLevel;
+    }
+
+    public static List<ICharacter> getCharacters() {
+        return characters;
+    }
+
+    public static void setCharacters(List<ICharacter> characters) {
+        GameInfo.characters = characters;
+    }
+
+    public static List<InventionCard> getIdeas() {
+        return ideas;
+    }
+
+    public static void setIdeas(List<InventionCard> ideas) {
+        GameInfo.ideas = ideas;
+    }
+
+    public static List<InventionCard> getInventions() {
+        return inventions;
+    }
+
+    public static void setInventions(List<InventionCard> inventions) {
+        GameInfo.inventions = inventions;
+    }
+
+    public static List<MysteryTreasureCard> getTreasures() {
+        return treasures;
+    }
+
+    public static void setTreasures(List<MysteryTreasureCard> treasures) {
+        GameInfo.treasures = treasures;
+    }
+
+    public static List<StartingItemCard> getStartingItems() {
+        return startingItems;
+    }
+
+    public static void setStartingItems(List<StartingItemCard> startingItems) {
+        GameInfo.startingItems = startingItems;
+    }
+
+    public static List<IslandTile> getDiscoveredTiles() {
+        return discoveredTiles;
+    }
+
+    public static void setDiscoveredTiles(List<IslandTile> discoveredTiles) {
+        GameInfo.discoveredTiles = discoveredTiles;
+    }
+
+    public static LinkedList<EventCard> getThreatActionCards() {
+        return threatActionCards;
+    }
+
+    public static void setThreatActionCards(LinkedList<EventCard> threatActionCards) {
+        GameInfo.threatActionCards = threatActionCards;
+    }
+
+    public static LinkedList<BeastCard> getAvaibleBeastCards() {
+        return avaibleBeastCards;
+    }
+
+    public static void setAvaibleBeastCards(LinkedList<BeastCard> avaibleBeastCards) {
+        GameInfo.avaibleBeastCards = avaibleBeastCards;
+    }
+
+    public static List<Marker> getAvaibleCharacterMarkers() {
+        return avaibleCharacterMarkers;
+    }
+
+    public static void setAvaibleCharacterMarkers(List<Marker> avaibleCharacterMarkers) {
+        GameInfo.avaibleCharacterMarkers = avaibleCharacterMarkers;
+    }
+
+    public static Resources getAvaibleResources() {
+        return avaibleResources;
+    }
+
+    public static void setAvaibleResources(Resources avaibleResources) {
+        GameInfo.avaibleResources = avaibleResources;
+    }
+
+    public static Resources getFutureResources() {
+        return futureResources;
+    }
+
+    public static void setFutureResources(Resources futureResources) {
+        GameInfo.futureResources = futureResources;
+    }
+
+    public static Character getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public static void setFirstPlayer(Character firstPlayer) {
+        GameInfo.firstPlayer = firstPlayer;
+    }
+
+    public static IslandTile getCamp() {
+        return camp;
+    }
+
+    public static void setCamp(IslandTile camp) {
+        GameInfo.camp = camp;
+    }
+
+    public static boolean isShelter() {
+        return shelter;
+    }
+
+    public static void setShelter(boolean shelter) {
+        GameInfo.shelter = shelter;
+    }
+
+    public static int getRoofLevel() {
+        return roofLevel;
+    }
+
+    public static void setRoofLevel(int roofLevel) {
+        GameInfo.roofLevel = roofLevel;
+    }
+
+    public static int getPalisadeLevel() {
+        return palisadeLevel;
+    }
+
+    public static void setPalisadeLevel(int palisadeLevel) {
+        GameInfo.palisadeLevel = palisadeLevel;
+    }
+
+    public static int getWeaponLevel() {
+        return weaponLevel;
+    }
+
+    public static void setWeaponLevel(int weaponLevel) {
+        GameInfo.weaponLevel = weaponLevel;
+    }
+
+    public static int getProductionFoodNumber() {
+        return productionFoodNumber;
+    }
+
+    public static void setProductionFoodNumber(int productionFoodNumber) {
+        GameInfo.productionFoodNumber = productionFoodNumber;
+    }
+
+    public static int getProductionWoodNumber() {
+        return productionWoodNumber;
+    }
+
+    public static void setProductionWoodNumber(int productionWoodNumber) {
+        GameInfo.productionWoodNumber = productionWoodNumber;
     }
 }

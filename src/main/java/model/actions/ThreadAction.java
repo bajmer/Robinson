@@ -1,17 +1,13 @@
 package model.actions;
 
-import controller.GameEngineController;
 import model.cards.EventCard;
-import model.enums.elements.MarkerType;
-
-import java.util.List;
 
 public class ThreadAction extends Action {
 
     private EventCard threadCard;
 
-    public ThreadAction(List<MarkerType> allowedMarkers) {
-        super(allowedMarkers);
+    public ThreadAction() {
+        super();
     }
 
     public EventCard getThreadCard() {
@@ -23,7 +19,7 @@ public class ThreadAction extends Action {
     }
 
     @Override
-    public void runAction(GameEngineController controller) {
+    public void runAction() {
 //        threadCard.runThreatAction(super.getAssignedMarkers());
     }
 }

@@ -1,30 +1,27 @@
 package model;
 
-import model.elements.Marker;
-import model.enums.SpecialSkillType;
+import controller.GameEventsListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
 
 public class Friday implements ICharacter {
     private Logger logger = LogManager.getLogger(Friday.class);
     private int life;
     private int determination;
-    private List<Marker> characterMarkers;
+    private GameEventsListener listener;
 
-    public Friday(int life, List<Marker> characterMarkers) {
+    public Friday(int life, GameEventsListener listener) {
         this.life = life;
-        this.characterMarkers = characterMarkers;
         this.determination = 0;
+        this.listener = listener;
     }
 
-    public List<Marker> getCharacterMarkers() {
-        return characterMarkers;
+    public GameEventsListener getListener() {
+        return listener;
     }
 
-    public void setCharacterMarkers(List<Marker> characterMarkers) {
-        this.characterMarkers = characterMarkers;
+    public void setListener(GameEventsListener listener) {
+        this.listener = listener;
     }
 
     public int getLife() {
@@ -44,18 +41,10 @@ public class Friday implements ICharacter {
     }
 
     @Override
-    public void useSpecialSkill(SpecialSkillType specialSkillType) {
-
-    }
-
-    @Override
     public void changeLife(int lives) {
         life += lives;
-        logger.debug("Liczba żyć Piętaszka:" + life);
-
-        if (life <= 0) {
-//            listener.handleGameEnd();
-        }
+        logger.debug("Liczba żyć Piętaszka wynosi:" + life);
+        if (life <= 0) listener.handleFridayDeath();
     }
 
     @Override
@@ -65,5 +54,6 @@ public class Friday implements ICharacter {
             changeLife(determination);
             determination = 0;
         }
+        logger.debug("Liczba żetonów determinacji Piętaszka wynosi: " + determination);
     }
 }

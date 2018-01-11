@@ -1,27 +1,19 @@
 package model.actions;
 
-import controller.GameEngineController;
 import model.GameInfo;
-import model.enums.elements.MarkerType;
-
-import java.util.List;
 
 public class CampOrderingAction extends Action {
 
-    public CampOrderingAction(List<MarkerType> allowedMarkers) {
-        super(allowedMarkers);
+    public CampOrderingAction() {
+        super();
     }
 
     @Override
-    public void runAction(GameEngineController controller) {
+    public void runAction() {
         super.getAssignedMarkers().forEach(marker -> {
-            MarkerType markerType = marker.getMarkerType();
-            controller.getGameInfo().getCharacters().forEach(iCharacter -> {
-                if (iCharacter.getCharacterMarkers().get(0).getMarkerType() == markerType) {
-                    iCharacter.changeDetermination(2);
-                    GameInfo.changeMoraleLevel(1);
-                }
-            });
+            marker.getCharacter().changeDetermination(2);
+            GameInfo.changeMoraleLevel(1);
+            super.getLogger().info("Porządkowanie obozu!");
         });
     }
 }

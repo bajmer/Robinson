@@ -1,6 +1,6 @@
 package model;
 
-import controller.GameEndListener;
+import controller.GameEventsListener;
 import model.enums.elements.DiceType;
 
 import java.util.List;
@@ -11,14 +11,14 @@ public class Scenario implements IScenario {
     private int roundsNumber;
     private int round;
     private Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping;
-    private GameEndListener gameEndListener;
+    private GameEventsListener gameEventsListener;
 
-    public Scenario(int id, int roundsNumber, Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping, GameEndListener gameEndListener) {
+    public Scenario(int id, int roundsNumber, Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping, GameEventsListener gameEventsListener) {
         this.id = id;
         this.roundsNumber = roundsNumber;
         this.roundIdToWeatherDicesMapping = roundIdToWeatherDicesMapping;
         this.round = 0;
-        this.gameEndListener = gameEndListener;
+        this.gameEventsListener = gameEventsListener;
     }
 
     public Map<Integer, List<DiceType>> getRoundIdToWeatherDicesMapping() {
@@ -98,7 +98,7 @@ public class Scenario implements IScenario {
     public void nextRound() {
         round += 1;
         if (round > roundsNumber) {
-            gameEndListener.handleGameEnd();
+            gameEventsListener.handleGameEnd();
         }
     }
 

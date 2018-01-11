@@ -1,7 +1,6 @@
 package model;
 
-import controller.GameEndListener;
-import model.elements.Marker;
+import controller.GameEventsListener;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 import model.enums.SpecialSkillType;
@@ -21,10 +20,9 @@ public class Character implements ICharacter {
     private int life;
     private int determination;
     private boolean firstPlayer;
-    private GameEndListener listener;
-    private List<Marker> characterMarkers;
+    private GameEventsListener listener;
 
-    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, List<Marker> characterMarkers, GameEndListener listener) {
+    public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, GameEventsListener listener) {
         this.profession = profession;
         this.sex = sex;
         this.personalInvention = personalInvention;
@@ -33,16 +31,7 @@ public class Character implements ICharacter {
         this.life = life;
         this.determination = 0;
         this.firstPlayer = false;
-        this.characterMarkers = characterMarkers;
         this.listener = listener;
-    }
-
-    public List<Marker> getCharacterMarkers() {
-        return characterMarkers;
-    }
-
-    public void setCharacterMarkers(List<Marker> characterMarkers) {
-        this.characterMarkers = characterMarkers;
     }
 
     public InventionType getPersonalInvention() {
@@ -151,13 +140,12 @@ public class Character implements ICharacter {
         if (lives < 0) {
             for (int i = life; i >= life + lives; i--) {
                 if (moraleDown.contains(i)) {
-                    logger.debug("Spadek morale!");
                     GameInfo.changeMoraleLevel(-1);
                 }
             }
         }
         life += lives;
-        logger.debug("Liczba żyć " + profession + ": " + life);
+        logger.debug("Liczba żyć postaci " + profession + " wynosi: " + life);
 
         if (life <= 0) {
             listener.handleGameEnd();
@@ -171,5 +159,6 @@ public class Character implements ICharacter {
             changeLife(determination);
             determination = 0;
         }
+        logger.debug("Liczba żetonów determinacji postaci " + profession + " wynosi: " + determination);
     }
 }

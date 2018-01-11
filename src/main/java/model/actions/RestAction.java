@@ -1,25 +1,16 @@
 package model.actions;
 
-import controller.GameEngineController;
-import model.enums.elements.MarkerType;
-
-import java.util.List;
-
 public class RestAction extends Action {
 
-    public RestAction(List<MarkerType> allowedMarkers) {
-        super(allowedMarkers);
+    public RestAction() {
+        super();
     }
 
     @Override
-    public void runAction(GameEngineController controller) {
+    public void runAction() {
         super.getAssignedMarkers().forEach(marker -> {
-            MarkerType markerType = marker.getMarkerType();
-            controller.getGameInfo().getCharacters().forEach(iCharacter -> {
-                if (iCharacter.getCharacterMarkers().get(0).getMarkerType() == markerType) {
-                    iCharacter.changeLife(1);
-                }
-            });
+            marker.getCharacter().changeLife(1);
+            super.getLogger().info("Odpoczynek!");
         });
     }
 }

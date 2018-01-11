@@ -1,41 +1,45 @@
 package model.actions;
 
-import controller.GameEngineController;
+import model.GameInfo;
 import model.ICharacter;
 import model.cards.BeastCard;
+import model.enums.cards.BeastType;
 import model.enums.elements.MarkerType;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class HuntingAction extends Action {
 
-    public HuntingAction(List<MarkerType> allowedMarkers) {
-        super(allowedMarkers);
+    public HuntingAction(List<MarkerType> extraMarkers) {
+        super(extraMarkers);
     }
 
     @Override
-    public void runAction(GameEngineController controller) {
+    public void runAction() {
         int assignedMarkersNumber = super.getAssignedMarkers().size();
-        MarkerType executiveCharacterMarker = super.getAssignedMarkers().get(0).getMarkerType();
-        AtomicReference<ICharacter> executiveCharacter = null;
-        controller.getGameInfo().getCharacters().forEach(iCharacter -> {
-            if (iCharacter.getCharacterMarkers().get(0).getMarkerType() == executiveCharacterMarker) {
-                executiveCharacter.set(iCharacter);
+        int huntingNumber = assignedMarkersNumber / 2;
+
+        for (int i = 0; i < huntingNumber; i++) {
+            ICharacter leaderCharacter = super.getAssignedMarkers().get(2 * i).getCharacter();
+            BeastCard beast = GameInfo.getAvaibleBeastCards().removeFirst();
+            BeastType name = beast.getBeast();
+            int strength = beast.getStrength();
+            int weaponLevelDecrease = beast.getWeaponLevelDecrease();
+            int foodAmount = beast.getFoodAmount();
+            int hideAmount = beast.getHideAmount();
+
+            super.getLogger().info("Walka z bestią: " + name + ". Siła: " + strength +
+                    ", spadek poziomu broni: " + weaponLevelDecrease +
+                    ", ilość pożywienia: " + foodAmount + ", ilość skór:" + hideAmount);
+
+            int weaponLevel = GameInfo.getWeaponLevel();
+            if (weaponLevel < strength) {
+                leaderCharacter.changeLife(weaponLevel - strength);
             }
-        });
 
-        int weaponLevel = controller.getGameInfo().getWeaponLevel();
-
-        BeastCard beast = controller.getGameInfo().getAvaibleBeastCards().removeFirst();
-        int beastStrenght = beast.getStrength();
-
-        if (weaponLevel < beastStrenght) {
-            executiveCharacter.get().changeLife(weaponLevel - beastStrenght);
+            GameInfo.changeWeaponLevel(beast.getWeaponLevelDecrease());
+            GameInfo.changeFoodLevel(beast.getFoodAmount(), null);
+            GameInfo.changeHideLevel(beast.getHideAmount());
         }
-
-        controller.getGameInfo().changeWeaponLevel(beast.getWeaponLevelDecrease());
-        controller.getGameInfo().changeFoodLevel(beast.getFoodAmount(), null);
-        controller.getGameInfo().changeHideLevel(beast.getHideAmount());
     }
 }
