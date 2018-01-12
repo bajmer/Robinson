@@ -5,6 +5,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import model.Action;
+import model.Character;
+import model.GameInfo;
+import model.elements.Marker;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 
@@ -40,24 +44,21 @@ public class GameWindowController {
         gameEngineController.nextPhase();
     }
 
-    public String showStarvingCharactersAlert(List<ProfessionType> professions) {
+    public String showStarvingCharactersAlert() {
         Alert alert = new Alert(CONFIRMATION);
         alert.setTitle("Brakuje jedzenia!");
         alert.setHeaderText("Wygląda na to, że ktoś dzisiaj nie zje kolacji...");
         alert.setContentText("Wybierz postać, która będzie dziś głodować i otrzyma 2 rany.");
 
         List<ButtonType> buttonTypes = new ArrayList<>();
-        for (ProfessionType profession : professions) {
-            buttonTypes.add(new ButtonType(profession.toString()));
-        }
+        GameInfo.getCharacters().stream().filter(character -> character instanceof Character).filter(x -> !((Character) x).isStarving()).forEach(
+                character -> buttonTypes.add(new ButtonType(((Character) character).getProfession().toString()))
+        );
+
         alert.getButtonTypes().setAll(buttonTypes);
         Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.isPresent()) {
-            return result.get().getText();
-        } else {
-            return null;
-        }
+        return (result.isPresent() ? result.get().getText() : null);
     }
 
     public void showGameEndAlert() {
@@ -72,6 +73,44 @@ public class GameWindowController {
         Alert alert = new Alert(WARNING);
         alert.setTitle("Śmierć Piętaszka!");
         alert.setHeaderText("Piętaszek zakończył swój żywot.");
+        alert.showAndWait();
+    }
+
+    public String showSelectMarkerAlert() {
+        Alert alert = new Alert(CONFIRMATION);
+        alert.setTitle("Wybór znacznika.");
+        alert.setHeaderText("Wybierz znacznik, do którego chcesz przypisać akcję.");
+
+        List<ButtonType> buttonTypes = new ArrayList<>();
+        GameInfo.getAllSelectionMarkers().stream().filter(Marker::isAvaible).forEach(
+                marker -> buttonTypes.add(new ButtonType(marker.getMarkerType().toString())));
+
+        alert.getButtonTypes().setAll(buttonTypes);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return (result.isPresent() ? result.get().getText() : null);
+    }
+
+    public String showSelectActionAlert() {
+        Alert alert = new Alert(CONFIRMATION);
+        alert.setTitle("Wybór akcji.");
+        alert.setHeaderText("Wybierz akcję, którą chcesz wykonać.");
+
+        List<ButtonType> buttonTypes = new ArrayList<>();
+        gameEngineController.getActionList().stream().filter(Action::isAvaible).forEach(
+                action -> buttonTypes.add(new ButtonType(action.getActionType().toString()))
+        );
+
+        alert.getButtonTypes().setAll(buttonTypes);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return (result.isPresent() ? result.get().getText() : null);
+    }
+
+    public void showCannotConnectMarkerWithActionAlert() {
+        Alert alert = new Alert(WARNING);
+        alert.setTitle("Nieprawidłowa akcja!");
+        alert.setHeaderText("Nie można przypisać znacznika do tej akcji!");
         alert.showAndWait();
     }
 }

@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 import model.Character;
-import model.actions.*;
 import model.cards.*;
 import model.elements.Dices;
 import model.elements.Marker;
@@ -30,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static model.enums.ProfessionType.*;
+import static model.enums.ActionType.*;
 import static model.enums.cards.eventcards.EventEffectType.*;
 import static model.enums.cards.eventcards.EventIconType.*;
 import static model.enums.elements.MarkerType.*;
@@ -43,7 +42,7 @@ public class GameEngineController implements GameEventsListener {
     private PhaseType phase;
     private Dices dices;
     private boolean isFriday;
-
+    private boolean isDog;
     private List<Action> actionList;
 
     GameEngineController(
@@ -56,10 +55,8 @@ public class GameEngineController implements GameEventsListener {
 
         this.gameWindowController = gameWindowController;
         this.isFriday = isFriday;
+        this.isDog = isDog;
 
-        if (isDog) {
-
-        }
         new Mappings();
         board = new Board();
         dices = new Dices();
@@ -78,6 +75,14 @@ public class GameEngineController implements GameEventsListener {
         createCharacterMarkers();
         createActions();
 
+    }
+
+    public List<Action> getActionList() {
+        return actionList;
+    }
+
+    public void setActionList(List<Action> actionList) {
+        this.actionList = actionList;
     }
 
     private void createScenario(int scenarioId) {
@@ -110,16 +115,24 @@ public class GameEngineController implements GameEventsListener {
     }
 
     private void createCharacterMarkers() {
-        GameInfo.getCharacters().forEach(character -> {
-            if (character instanceof Character) {
-                GameInfo.getAvaibleCharacterMarkers().add(new Marker(
+        GameInfo.getCharacters().stream().filter(character -> character instanceof Character).forEach(character -> {
+            for (int i = 0; i < 2; i++) {
+                GameInfo.getAllSelectionMarkers().add(new Marker(
                         Mappings.getProfessionToMarkerMapping().get(((Character) character).getProfession()),
-                        character
-                ));
-            } else {
-                GameInfo.getAvaibleCharacterMarkers().add(new Marker(FRIDAY_MARKER, character));
+                        character));
+
             }
         });
+
+        if (isFriday) {
+            GameInfo.getAllSelectionMarkers().add(new Marker(
+                    FRIDAY_MARKER,
+                    GameInfo.getCharacters().stream().filter(character -> character instanceof Friday).findAny().get()
+            ));
+        }
+        if (isDog) {
+            GameInfo.getAllSelectionMarkers().add(new Marker(DOG_MARKER, null));
+        }
     }
 
     private void createEventCardsDeck() {
@@ -311,13 +324,13 @@ public class GameEngineController implements GameEventsListener {
 
     private void createActions() {
         actionList = new ArrayList<>();
-        actionList.add(new ThreadAction());
-        actionList.add(new HuntingAction(new ArrayList<>(Arrays.asList(DOG_MARKER, HUNTING_HELPER_MARKER))));
-        actionList.add(new BuildingAction(new ArrayList<>(Collections.singletonList(BUILDING_HELPER_MARKER))));
-        actionList.add(new GatheringResourcesAction(new ArrayList<>(Collections.singletonList(GATHERING_RESOURCES_HELPER_MARKER))));
-        actionList.add(new ExplorationAction(new ArrayList<>(Arrays.asList(DOG_MARKER, EXPLORATION_HELPER_MARKER))));
-        actionList.add(new CampOrderingAction());
-        actionList.add(new RestAction());
+        actionList.add(new Action(THREAD_ACTION, null));
+        actionList.add(new Action(HUNTING_ACTION, new ArrayList<>(Arrays.asList(DOG_MARKER, HUNTING_HELPER_MARKER))));
+        actionList.add(new Action(BUILDING_ACTION, new ArrayList<>(Collections.singletonList(BUILDING_HELPER_MARKER))));
+        actionList.add(new Action(GATHERING_RESOURCES_ACTION, new ArrayList<>(Collections.singletonList(GATHERING_RESOURCES_HELPER_MARKER))));
+        actionList.add(new Action(EXPLORATION_ACTION, new ArrayList<>(Arrays.asList(DOG_MARKER, EXPLORATION_HELPER_MARKER))));
+        actionList.add(new Action(CAMP_ORDERING_ACTION, null));
+        actionList.add(new Action(REST_ACTION, null));
     }
 
     public void nextPhase() {
@@ -336,6 +349,8 @@ public class GameEngineController implements GameEventsListener {
 
             GameInfo.setFirstPlayer((Character) GameInfo.getCharacters().get(firstPlayerId));
             logger.debug("Pierwszy gracz: " + GameInfo.getFirstPlayer().getProfession());
+
+            resetAvaibleMarkers();
         }
 
         logger.info("Obecna faza: " + phase);
@@ -407,8 +422,8 @@ public class GameEngineController implements GameEventsListener {
     }
 
     private void runActionPhase() {
-//        przygotowanie
-
+        resetAvaibleActions();
+        handleMarkerSelect();
 //        actionList.forEach(Action::runAction);
     }
 
@@ -461,7 +476,7 @@ public class GameEngineController implements GameEventsListener {
         if (missingRoofLevel > 0) {
             logger.debug("--->Liczba wszystkich chmur: " + cloudsSum + ". Za każdy brakujący poziom dachu należy odrzucić 1 drewno i 1 jedzenie.");
             GameInfo.changeWoodLevel(-missingRoofLevel);
-            GameInfo.changeFoodLevel(-missingRoofLevel, null);
+            GameInfo.changeFoodLevel(-missingRoofLevel);
         }
 
         if (beastAttack.get()) {
@@ -471,7 +486,7 @@ public class GameEngineController implements GameEventsListener {
             GameInfo.changePalisadeLevel(-1);
         } else if (foodDiscard.get()) {
             logger.info("--->Należy odrzucić 1 jedzenie!");
-            GameInfo.changeFoodLevel(-1, null);
+            GameInfo.changeFoodLevel(-1);
         }
     }
 
@@ -487,7 +502,13 @@ public class GameEngineController implements GameEventsListener {
         int allFoodAmount = foodAmount + longExpiryDateFoodAmount;
 
         logger.debug("--->Kolacja! Każda postać musi zjeść posiłek...");
-        GameInfo.changeFoodLevel(-requiredFood, chooseStarvingCharacters(requiredFood - allFoodAmount));
+        resetStarvingCharacters();
+        if (requiredFood > allFoodAmount) {
+            chooseStarvingCharacters(requiredFood - allFoodAmount);
+            GameInfo.changeFoodLevel(-allFoodAmount);
+        } else {
+            GameInfo.changeFoodLevel(-requiredFood);
+        }
 
 //        opcja przeniesienia obozu
         IslandTile camp = GameInfo.getCamp();
@@ -515,41 +536,46 @@ public class GameEngineController implements GameEventsListener {
         }
     }
 
-    private List<ProfessionType> chooseStarvingCharacters(int value) {
-        List<ProfessionType> starvingProfessions = null;
-        if (value > 1) {
-            starvingProfessions = new ArrayList<>();
-            List<ProfessionType> notChosenProfessions = new ArrayList<>();
-            GameInfo.getCharacters().forEach(character -> {
-                if (character instanceof Character) {
-                    notChosenProfessions.add(((Character) character).getProfession());
-                }
-            });
+    private void chooseStarvingCharacters(int value) {
+        for (int i = 0; i < value; i++) {
+            String result = gameWindowController.showStarvingCharactersAlert();
+            Character character = (Character) GameInfo.getCharacters().stream()
+                    .filter(x -> (result.equals(((Character) x).getProfession().toString()))).findAny().get();
 
-            for (int i = 0; i < value; i++) {
-                String result = gameWindowController.showStarvingCharactersAlert(notChosenProfessions);
-                if (result != null) {
-                    if (result.equals(CARPENTER.toString())) {
-                        notChosenProfessions.remove(CARPENTER);
-                        starvingProfessions.add(CARPENTER);
-                        logger.info("--->Dziś kolacji nie zje cieśla!");
-                    } else if (result.equals(COOK.toString())) {
-                        notChosenProfessions.remove(COOK);
-                        starvingProfessions.add(COOK);
-                        logger.info("--->Dziś kolacji nie zje kucharz!");
-                    } else if (result.equals(EXPLORER.toString())) {
-                        notChosenProfessions.remove(EXPLORER);
-                        starvingProfessions.add(EXPLORER);
-                        logger.info("--->Dziś kolacji nie zje odkrywca!");
-                    } else if (result.equals(SOLDIER.toString())) {
-                        notChosenProfessions.remove(SOLDIER);
-                        starvingProfessions.add(SOLDIER);
-                        logger.info("--->Dziś kolacji nie zje żołnierz!");
-                    }
-                }
+            character.changeLife(-2);
+            character.setStarving(true);
+        }
+    }
+
+    private void handleMarkerSelect() {
+        while (GameInfo.getAllSelectionMarkers().stream().anyMatch(Marker::isAvaible)) {
+            String resultMarker = gameWindowController.showSelectMarkerAlert();
+            Marker marker = GameInfo.getAllSelectionMarkers().stream().filter(
+                    x -> resultMarker.equals(x.getMarkerType().toString())).filter(Marker::isAvaible).findAny().get();
+
+            String resultAction = gameWindowController.showSelectActionAlert();
+            Action action = actionList.stream().filter(
+                    x -> resultAction.equals(x.getActionType().toString())).findAny().get();
+
+            if (action.getAllowedMarkers().contains(marker.getMarkerType())) {
+                action.addMarkerToAction(marker);
+                marker.setAvaible(false);
+            } else {
+                gameWindowController.showCannotConnectMarkerWithActionAlert();
             }
         }
-        return starvingProfessions;
+    }
+
+    private void resetAvaibleMarkers() {
+        GameInfo.getAllSelectionMarkers().forEach(marker -> marker.setAvaible(true));
+    }
+
+    private void resetAvaibleActions() {
+        actionList.forEach(action -> action.setAvaible(true));
+    }
+
+    private void resetStarvingCharacters() {
+        GameInfo.getCharacters().forEach(character -> ((Character) character).setStarving(false));
     }
 
     @Override

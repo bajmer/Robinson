@@ -20,6 +20,7 @@ public class Character implements ICharacter {
     private int life;
     private int determination;
     private boolean firstPlayer;
+    private boolean starving;
     private GameEventsListener listener;
 
     public Character(ProfessionType profession, SexType sex, InventionType personalInvention, List<SpecialSkillType> specialSkills, List<Integer> moraleDown, int life, GameEventsListener listener) {
@@ -31,7 +32,16 @@ public class Character implements ICharacter {
         this.life = life;
         this.determination = 0;
         this.firstPlayer = false;
+        this.starving = false;
         this.listener = listener;
+    }
+
+    public boolean isStarving() {
+        return starving;
+    }
+
+    public void setStarving(boolean starving) {
+        this.starving = starving;
     }
 
     public InventionType getPersonalInvention() {

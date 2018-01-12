@@ -2,7 +2,6 @@ package model;
 
 import model.cards.*;
 import model.elements.Marker;
-import model.enums.ProfessionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +20,7 @@ public class GameInfo {
     private static List<IslandTile> discoveredTiles = new ArrayList<>();
     private static LinkedList<EventCard> threatActionCards = new LinkedList<>();
     private static LinkedList<BeastCard> avaibleBeastCards = new LinkedList<>();
-    private static List<Marker> avaibleCharacterMarkers = new ArrayList<>();
+    private static List<Marker> allSelectionMarkers = new ArrayList<>();
     private static Resources avaibleResources = new Resources();
     private static Resources futureResources = new Resources();
     private static Character firstPlayer;
@@ -33,7 +32,6 @@ public class GameInfo {
     private static int weaponLevel = 0;
     private static int productionFoodNumber = 1;
     private static int productionWoodNumber = 1;
-
     public GameInfo() {
     }
 
@@ -59,23 +57,13 @@ public class GameInfo {
         }
     }
 
-    public static void changeFoodLevel(int value, List<ProfessionType> starvingProfessions) {
+    public static void changeFoodLevel(int value) {
         avaibleResources.setFoodAmount(avaibleResources.getFoodAmount() + value);
         if (avaibleResources.getFoodAmount() < 0) {
             avaibleResources.setLongExpiryDateFoodAmount(avaibleResources.getLongExpiryDateFoodAmount() + avaibleResources.getFoodAmount());
             avaibleResources.setFoodAmount(0);
             if (avaibleResources.getLongExpiryDateFoodAmount() < 0) {
-                if (starvingProfessions == null) {
-                    decreaseLifeForAllCharacters(avaibleResources.getLongExpiryDateFoodAmount());
-                } else {
-                    characters.forEach(character -> {
-                        if (character instanceof Character) {
-                            if (starvingProfessions.contains(((Character) character).getProfession())) {
-                                character.changeLife(-2);
-                            }
-                        }
-                    });
-                }
+                decreaseLifeForAllCharacters(avaibleResources.getLongExpiryDateFoodAmount());
                 avaibleResources.setLongExpiryDateFoodAmount(0);
             }
         }
@@ -193,12 +181,12 @@ public class GameInfo {
         GameInfo.avaibleBeastCards = avaibleBeastCards;
     }
 
-    public static List<Marker> getAvaibleCharacterMarkers() {
-        return avaibleCharacterMarkers;
+    public static List<Marker> getAllSelectionMarkers() {
+        return allSelectionMarkers;
     }
 
-    public static void setAvaibleCharacterMarkers(List<Marker> avaibleCharacterMarkers) {
-        GameInfo.avaibleCharacterMarkers = avaibleCharacterMarkers;
+    public static void setAllSelectionMarkers(List<Marker> allSelectionMarkers) {
+        GameInfo.allSelectionMarkers = allSelectionMarkers;
     }
 
     public static Resources getAvaibleResources() {
