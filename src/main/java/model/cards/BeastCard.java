@@ -4,7 +4,7 @@ import model.enums.cards.BeastType;
 
 import java.util.List;
 
-public class BeastCard implements Usable {
+public class BeastCard {
     private BeastType beast;
     private int strength;
     private int weaponLevelDecrease;
@@ -57,10 +57,5 @@ public class BeastCard implements Usable {
 
     public void setHideAmount(int hideAmount) {
         this.hideAmount = hideAmount;
-    }
-
-    @Override
-    public void use() {
-
     }
 }

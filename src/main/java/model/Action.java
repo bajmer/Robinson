@@ -1,34 +1,48 @@
 package model;
 
 import model.cards.BeastCard;
+import model.cards.RequirableCard;
 import model.elements.Marker;
-import model.enums.ActionType;
+import model.enums.action.ActionType;
+import model.enums.action.BuildingActionType;
 import model.enums.cards.BeastType;
 import model.enums.elements.MarkerType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static model.enums.elements.MarkerType.*;
 
 public class Action {
     private Logger logger = LogManager.getLogger(Action.class);
     private ActionType actionType;
     private List<MarkerType> allowedMarkers;
     private List<Marker> assignedMarkers;
-    private boolean isAvaible;
+    private boolean actionAvailable;
+    private RequirableCard requirableCard;
+    private BuildingActionType buildingActionType;
 
-    public Action(ActionType actionType, List<MarkerType> extraMarkers) {
+    public Action(ActionType actionType) {
         this.actionType = actionType;
-        this.allowedMarkers = new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER));
-        if (extraMarkers != null) {
-            this.allowedMarkers.addAll(extraMarkers);
-        }
+        this.allowedMarkers = Mappings.getActionToAllowedMarkerMapping().get(actionType);
         this.assignedMarkers = new ArrayList<>();
-        this.isAvaible = false;
+        this.actionAvailable = true;
+    }
+
+    public Action(ActionType actionType, RequirableCard requirableCard) {
+        this.actionType = actionType;
+        this.allowedMarkers = Mappings.getActionToAllowedMarkerMapping().get(actionType);
+        this.assignedMarkers = new ArrayList<>();
+        this.actionAvailable = true;
+        this.requirableCard = requirableCard;
+    }
+
+    public Action(ActionType actionType, BuildingActionType buildingActionType, boolean actionAvailable) {
+        this.actionType = actionType;
+        this.allowedMarkers = Mappings.getActionToAllowedMarkerMapping().get(actionType);
+        this.assignedMarkers = new ArrayList<>();
+        this.buildingActionType = buildingActionType;
+        this.actionAvailable = actionAvailable;
     }
 
     public ActionType getActionType() {
@@ -39,12 +53,12 @@ public class Action {
         this.actionType = actionType;
     }
 
-    public boolean isAvaible() {
-        return isAvaible;
+    public boolean isActionAvailable() {
+        return actionAvailable;
     }
 
-    public void setAvaible(boolean avaible) {
-        isAvaible = avaible;
+    public void setActionAvailable(boolean actionAvailable) {
+        this.actionAvailable = actionAvailable;
     }
 
     public Logger getLogger() {
@@ -71,6 +85,22 @@ public class Action {
         this.assignedMarkers = assignedMarkers;
     }
 
+    public RequirableCard getRequirableCard() {
+        return requirableCard;
+    }
+
+    public void setRequirableCard(RequirableCard requirableCard) {
+        this.requirableCard = requirableCard;
+    }
+
+    public BuildingActionType getBuildingActionType() {
+        return buildingActionType;
+    }
+
+    public void setBuildingActionType(BuildingActionType buildingActionType) {
+        this.buildingActionType = buildingActionType;
+    }
+
     public void runAction() {
         switch (actionType) {
             case THREAD_ACTION:
@@ -82,7 +112,7 @@ public class Action {
 
                 for (int i = 0; i < huntingNumber; i++) {
                     ICharacter leaderCharacter = assignedMarkers.get(2 * i).getCharacter();
-                    BeastCard beast = GameInfo.getAvaibleBeastCards().removeFirst();
+                    BeastCard beast = GameInfo.getAvailableBeastCards().removeFirst();
                     BeastType name = beast.getBeast();
                     int strength = beast.getStrength();
                     int weaponLevelDecrease = beast.getWeaponLevelDecrease();

@@ -1,6 +1,6 @@
 package model;
 
-import controller.GameEventsListener;
+import controller.engine.GameEventsListener;
 import model.enums.ProfessionType;
 import model.enums.SexType;
 import model.enums.SpecialSkillType;
@@ -155,7 +155,7 @@ public class Character implements ICharacter {
             }
         }
         life += lives;
-        logger.debug("Liczba żyć postaci " + profession + " wynosi: " + life);
+        logger.debug("Zmiana liczby żyć o " + lives + "! Liczba żyć postaci " + profession + " wynosi: " + life);
 
         if (life <= 0) {
             listener.handleGameEnd();
@@ -166,9 +166,11 @@ public class Character implements ICharacter {
     public void changeDetermination(int determinations) {
         determination += determinations;
         if (determination < 0) {
+            logger.debug("Brak żetonów determinacji! Za każdy brakujący żeton postać otrzymuje ranę!");
             changeLife(determination);
             determination = 0;
+        } else {
+            logger.debug("Zmiana liczby żetonów determinacji o " + determinations + "! Liczba żetonów determinacji postaci " + profession + " wynosi: " + determination);
         }
-        logger.debug("Liczba żetonów determinacji postaci " + profession + " wynosi: " + determination);
     }
 }

@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.cards.mysterycards.MysteryTreasureType;
 
-public class MysteryTreasureCard implements Usable {
+public class MysteryTreasureCard implements Mysterious {
     private MysteryTreasureType treasureType;
 
     public MysteryTreasureCard(MysteryTreasureType treasureType) {
@@ -15,10 +15,5 @@ public class MysteryTreasureCard implements Usable {
 
     public void setTreasureType(MysteryTreasureType treasureType) {
         this.treasureType = treasureType;
-    }
-
-    @Override
-    public void use() {
-
     }
 }

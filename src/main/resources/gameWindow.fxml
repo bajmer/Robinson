@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.Pane?>
 <Pane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
       minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141"
-      fx:controller="controller.GameWindowController">
+      fx:controller="controller.gui.GameWindowController">
     <children>
         <Button fx:id="button" layoutX="268.0" layoutY="185.0" mnemonicParsing="false" onAction="#onAction"
                 text="ekran2"/>

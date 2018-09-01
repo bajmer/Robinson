@@ -4,6 +4,7 @@ import model.enums.PhaseType;
 import model.enums.ProfessionType;
 import model.enums.SpecialSkillType;
 import model.enums.TerrainType;
+import model.enums.action.ActionType;
 import model.enums.cards.BeastType;
 import model.enums.cards.InventionType;
 import model.enums.cards.adventurecards.AdventureEventEffectType;
@@ -32,7 +33,7 @@ import static model.enums.cards.adventurecards.ExplorationAdventureType.*;
 import static model.enums.cards.adventurecards.GatheringResourcesAdventureType.*;
 import static model.enums.cards.eventcards.EventEffectType.*;
 import static model.enums.cards.eventcards.EventIconType.*;
-import static model.enums.cards.eventcards.ThreatActionType.THREAT_ACTION;
+import static model.enums.cards.eventcards.ThreatActionType.JAKAS_AKCJA_ZAGROZENIE;
 import static model.enums.cards.eventcards.ThreatEffectType.THREAT_EFFECT;
 import static model.enums.elements.DiceType.*;
 import static model.enums.elements.MarkerType.*;
@@ -60,6 +61,14 @@ public class Mappings {
     private static Map<InventionType, Boolean> inventionToIsMandatoryMapping = new HashMap<>();
     private static Map<InventionType, Boolean> inventionToMultipleInventionMapping = new HashMap<>();
     private static Map<InventionType, ProfessionType> inventionToOwnerMapping = new HashMap<>();
+    private static Map<InventionType, List<TerrainType>> inventionToRequiredTerrainsMapping = new HashMap<>();
+    private static Map<InventionType, List<InventionType>> inventionToRequiredInventionsMapping = new HashMap<>();
+    private static Map<InventionType, Integer> inventionToRequiredWoodMapping = new HashMap<>();
+    private static Map<InventionType, Integer> inventionToRequiredHidesMapping = new HashMap<>();
+    private static Map<ThreatActionType, List<TerrainType>> threatActionToRequiredTerrainsMapping = new HashMap<>();
+    private static Map<ThreatActionType, List<InventionType>> threatActionToRequiredInventionsMapping = new HashMap<>();
+    private static Map<ThreatActionType, Integer> threatActionToRequiredWoodMapping = new HashMap<>();
+    private static Map<ThreatActionType, Integer> threatActionToRequiredHidesMapping = new HashMap<>();
     private static Map<ProfessionType, List<SpecialSkillType>> professionToSpecialSkillMapping = new HashMap<>();
     private static Map<ProfessionType, InventionType> professionToPersonalInventionMapping = new HashMap<>();
     private static Map<ProfessionType, List<Integer>> professionToMoraleDownMapping = new HashMap<>();
@@ -73,8 +82,10 @@ public class Mappings {
     private static Map<Integer, Integer> islandTileIdToDiscoveryTokensNumberMapping = new HashMap<>();
     private static Map<Integer, Boolean> islandTileIdToHasNaturalShelterMapping = new HashMap<>();
     private static Map<PhaseType, PhaseType> currentPhaseToNextPhaseMapping = new HashMap<>();
-    public Mappings() {
+    private static Map<ActionType, List<MarkerType>> actionToAllowedMarkerMapping = new HashMap<>();
+    private static Map<Integer, List<Integer>> tilePositionToNeighboursMapping = new HashMap<>();
 
+    public Mappings() {
         eventEffectToEventIconMapping.put(FOOD_CRATES, null);
         eventEffectToEventIconMapping.put(WRECKED_LIFEBOAT, null);
         eventEffectToEventIconMapping.put(CAPTAINS_CHEST, null);
@@ -152,82 +163,82 @@ public class Mappings {
         eventEffectToEventIconMapping.put(RAVENOUS_PREDATORS, BOOK);
         eventEffectToEventIconMapping.put(OTTERS, GATHERING_RESOURCES_ADVENTURE);
 
-        eventEffectToThreatActionMapping.put(FOOD_CRATES, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(WRECKED_LIFEBOAT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CAPTAINS_CHEST, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(WINTER_DEPRESSION, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CHRONIC_TIREDNESS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(HIGH_WATER, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(FROST, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(WRECKED_BALLOON, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(PREDATORS_IN_THE_VICINITY, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(NIGHT_HOWLING, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(POISONING, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CULLED_AREA, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(BODY_ON_THE_BEACH, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(COLD_RAIN_1, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(COLD_RAIN_2, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(MEMORIES_OF_THE_CRUISE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(THUNDERSTORM, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(PREDATORS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CALL_OF_THE_WILD, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EARTHQUAKE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DESTRUCTIVE_HURRICANE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(LANDSLIDE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(BAD_FEELINGS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(MESS_IN_THE_CAMP, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(THE_ISLAND_REBELS_AGAINST_YOU, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(NATURAL_DAM_BREAKS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(RAGING_RIVER, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(FLOOD, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(VERTIGO, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(HEAVY_RAIN, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(WEAKNESS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(SLOW_WORK, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(RAIN, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(PREDATORS_IN_THE_WOODS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(BAD_FATE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EventEffectType.BEAR, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CATACLYSM, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(SEARCHING_FOR_A_NEW_PATH, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(FIGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(ARGUMENT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(CLOUD_BURST, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(HEAVY_CLOUDS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(RAVAGING_HURRICANE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(RAVISHING_WINDSTORM, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EventEffectType.FIRE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(SLEEPLESS_NIGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(PREDATOR_IS_NEAR, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(STORM_1, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(STORM_2, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EXHAUSTING_NIGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(BROKEN_TREE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(STRONG_WIND, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EventEffectType.WEATHER_BREAKDOWN, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(MIST, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DEPRESSION, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DISASTER, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(FLYING_SURPRISE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DEVASTATING_BLOWS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EventEffectType.LACK_OF_HOPE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(LOSS_OF_HOPE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(FIGHT_IN_THE_DARK, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DANGEROUS_NIGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(NIGHT_ATTACK, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(HOWLING_FROM_THE_WOODS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(SMOKE_ON_THE_HORIZON, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(DROUGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(ROUGH_PASSAGE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(UNUSUALLY_COLD_NIGHT, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(COUNCIL, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(INSECTS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(HEAVY_RAIN_IS_COMING, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(AWFUL_WEATHER, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(PRECIPICE, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(EventEffectType.JAGUAR, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(RAVENOUS_PREDATORS, THREAT_ACTION);
-        eventEffectToThreatActionMapping.put(OTTERS, THREAT_ACTION);
+        eventEffectToThreatActionMapping.put(FOOD_CRATES, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(WRECKED_LIFEBOAT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CAPTAINS_CHEST, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(WINTER_DEPRESSION, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CHRONIC_TIREDNESS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(HIGH_WATER, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(FROST, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(WRECKED_BALLOON, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(PREDATORS_IN_THE_VICINITY, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(NIGHT_HOWLING, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(POISONING, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CULLED_AREA, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(BODY_ON_THE_BEACH, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(COLD_RAIN_1, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(COLD_RAIN_2, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(MEMORIES_OF_THE_CRUISE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(THUNDERSTORM, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(PREDATORS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CALL_OF_THE_WILD, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EARTHQUAKE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DESTRUCTIVE_HURRICANE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(LANDSLIDE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(BAD_FEELINGS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(MESS_IN_THE_CAMP, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(THE_ISLAND_REBELS_AGAINST_YOU, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(NATURAL_DAM_BREAKS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(RAGING_RIVER, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(FLOOD, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(VERTIGO, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(HEAVY_RAIN, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(WEAKNESS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(SLOW_WORK, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(RAIN, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(PREDATORS_IN_THE_WOODS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(BAD_FATE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EventEffectType.BEAR, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CATACLYSM, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(SEARCHING_FOR_A_NEW_PATH, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(FIGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(ARGUMENT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(CLOUD_BURST, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(HEAVY_CLOUDS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(RAVAGING_HURRICANE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(RAVISHING_WINDSTORM, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EventEffectType.FIRE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(SLEEPLESS_NIGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(PREDATOR_IS_NEAR, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(STORM_1, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(STORM_2, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EXHAUSTING_NIGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(BROKEN_TREE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(STRONG_WIND, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EventEffectType.WEATHER_BREAKDOWN, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(MIST, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DEPRESSION, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DISASTER, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(FLYING_SURPRISE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DEVASTATING_BLOWS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EventEffectType.LACK_OF_HOPE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(LOSS_OF_HOPE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(FIGHT_IN_THE_DARK, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DANGEROUS_NIGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(NIGHT_ATTACK, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(HOWLING_FROM_THE_WOODS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(SMOKE_ON_THE_HORIZON, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(DROUGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(ROUGH_PASSAGE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(UNUSUALLY_COLD_NIGHT, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(COUNCIL, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(INSECTS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(HEAVY_RAIN_IS_COMING, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(AWFUL_WEATHER, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(PRECIPICE, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(EventEffectType.JAGUAR, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(RAVENOUS_PREDATORS, JAKAS_AKCJA_ZAGROZENIE);
+        eventEffectToThreatActionMapping.put(OTTERS, JAKAS_AKCJA_ZAGROZENIE);
 
         eventEffectToThreatEffectMapping.put(FOOD_CRATES, THREAT_EFFECT);
         eventEffectToThreatEffectMapping.put(WRECKED_LIFEBOAT, THREAT_EFFECT);
@@ -531,6 +542,187 @@ public class Mappings {
         inventionToMultipleInventionMapping.put(TRAP, true);
         inventionToMultipleInventionMapping.put(TRANSQUELEZER, false);
 
+        inventionToRequiredTerrainsMapping.put(BOW, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(BRICKS, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(DAM, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(InventionType.FIRE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(KNIFE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(MAP, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(POT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(ROPE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SHOVEL, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(BASKET, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(BED, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(BELTS, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(CELLAR, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(CORRAL, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(CURE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(DIARY, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(DRUMS, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(FIREPLACE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(FURNACE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(LANTERN, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(MOAT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(PIT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(RAFT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SACK, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SHIELD, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SHORTCUT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SLING, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SNARE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SPEAR, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(WALL, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(HATCHET, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(MAST, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(SACRED_BELL, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(CROSS, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(JENNY_RAFT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(LIFEBOAT, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(BALLISTA, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(CANOE, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(GARDEN, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(TRAP, new ArrayList<>());
+        inventionToRequiredTerrainsMapping.put(TRANSQUELEZER, new ArrayList<>());
+
+        inventionToRequiredInventionsMapping.put(BOW, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(BRICKS, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(DAM, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(InventionType.FIRE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(KNIFE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(MAP, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(POT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(ROPE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SHOVEL, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(BASKET, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(BED, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(BELTS, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(CELLAR, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(CORRAL, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(CURE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(DIARY, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(DRUMS, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(FIREPLACE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(FURNACE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(LANTERN, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(MOAT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(PIT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(RAFT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SACK, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SHIELD, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SHORTCUT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SLING, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SNARE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SPEAR, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(WALL, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(HATCHET, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(MAST, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(SACRED_BELL, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(CROSS, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(JENNY_RAFT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(LIFEBOAT, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(BALLISTA, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(CANOE, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(GARDEN, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(TRAP, new ArrayList<>());
+        inventionToRequiredInventionsMapping.put(TRANSQUELEZER, new ArrayList<>());
+
+        inventionToRequiredWoodMapping.put(BOW, 1);
+        inventionToRequiredWoodMapping.put(BRICKS, 1);
+        inventionToRequiredWoodMapping.put(DAM, 1);
+        inventionToRequiredWoodMapping.put(InventionType.FIRE, 1);
+        inventionToRequiredWoodMapping.put(KNIFE, 1);
+        inventionToRequiredWoodMapping.put(MAP, 1);
+        inventionToRequiredWoodMapping.put(POT, 1);
+        inventionToRequiredWoodMapping.put(ROPE, 1);
+        inventionToRequiredWoodMapping.put(SHOVEL, 1);
+        inventionToRequiredWoodMapping.put(BASKET, 1);
+        inventionToRequiredWoodMapping.put(BED, 1);
+        inventionToRequiredWoodMapping.put(BELTS, 1);
+        inventionToRequiredWoodMapping.put(CELLAR, 1);
+        inventionToRequiredWoodMapping.put(CORRAL, 1);
+        inventionToRequiredWoodMapping.put(CURE, 1);
+        inventionToRequiredWoodMapping.put(DIARY, 1);
+        inventionToRequiredWoodMapping.put(DRUMS, 1);
+        inventionToRequiredWoodMapping.put(FIREPLACE, 1);
+        inventionToRequiredWoodMapping.put(FURNACE, 1);
+        inventionToRequiredWoodMapping.put(LANTERN, 1);
+        inventionToRequiredWoodMapping.put(MOAT, 1);
+        inventionToRequiredWoodMapping.put(PIT, 1);
+        inventionToRequiredWoodMapping.put(RAFT, 1);
+        inventionToRequiredWoodMapping.put(SACK, 1);
+        inventionToRequiredWoodMapping.put(SHIELD, 1);
+        inventionToRequiredWoodMapping.put(SHORTCUT, 1);
+        inventionToRequiredWoodMapping.put(SLING, 1);
+        inventionToRequiredWoodMapping.put(SNARE, 1);
+        inventionToRequiredWoodMapping.put(SPEAR, 1);
+        inventionToRequiredWoodMapping.put(WALL, 1);
+        inventionToRequiredWoodMapping.put(HATCHET, 1);
+        inventionToRequiredWoodMapping.put(MAST, 1);
+        inventionToRequiredWoodMapping.put(SACRED_BELL, 1);
+        inventionToRequiredWoodMapping.put(CROSS, 1);
+        inventionToRequiredWoodMapping.put(JENNY_RAFT, 1);
+        inventionToRequiredWoodMapping.put(LIFEBOAT, 1);
+        inventionToRequiredWoodMapping.put(BALLISTA, 1);
+        inventionToRequiredWoodMapping.put(CANOE, 1);
+        inventionToRequiredWoodMapping.put(GARDEN, 1);
+        inventionToRequiredWoodMapping.put(TRAP, 1);
+        inventionToRequiredWoodMapping.put(TRANSQUELEZER, 1);
+
+        inventionToRequiredHidesMapping.put(BOW, 1);
+        inventionToRequiredHidesMapping.put(BRICKS, 1);
+        inventionToRequiredHidesMapping.put(DAM, 1);
+        inventionToRequiredHidesMapping.put(InventionType.FIRE, 1);
+        inventionToRequiredHidesMapping.put(KNIFE, 1);
+        inventionToRequiredHidesMapping.put(MAP, 1);
+        inventionToRequiredHidesMapping.put(POT, 1);
+        inventionToRequiredHidesMapping.put(ROPE, 1);
+        inventionToRequiredHidesMapping.put(SHOVEL, 1);
+        inventionToRequiredHidesMapping.put(BASKET, 1);
+        inventionToRequiredHidesMapping.put(BED, 1);
+        inventionToRequiredHidesMapping.put(BELTS, 1);
+        inventionToRequiredHidesMapping.put(CELLAR, 1);
+        inventionToRequiredHidesMapping.put(CORRAL, 1);
+        inventionToRequiredHidesMapping.put(CURE, 1);
+        inventionToRequiredHidesMapping.put(DIARY, 1);
+        inventionToRequiredHidesMapping.put(DRUMS, 1);
+        inventionToRequiredHidesMapping.put(FIREPLACE, 1);
+        inventionToRequiredHidesMapping.put(FURNACE, 1);
+        inventionToRequiredHidesMapping.put(LANTERN, 1);
+        inventionToRequiredHidesMapping.put(MOAT, 1);
+        inventionToRequiredHidesMapping.put(PIT, 1);
+        inventionToRequiredHidesMapping.put(RAFT, 1);
+        inventionToRequiredHidesMapping.put(SACK, 1);
+        inventionToRequiredHidesMapping.put(SHIELD, 1);
+        inventionToRequiredHidesMapping.put(SHORTCUT, 1);
+        inventionToRequiredHidesMapping.put(SLING, 1);
+        inventionToRequiredHidesMapping.put(SNARE, 1);
+        inventionToRequiredHidesMapping.put(SPEAR, 1);
+        inventionToRequiredHidesMapping.put(WALL, 1);
+        inventionToRequiredHidesMapping.put(HATCHET, 1);
+        inventionToRequiredHidesMapping.put(MAST, 1);
+        inventionToRequiredHidesMapping.put(SACRED_BELL, 1);
+        inventionToRequiredHidesMapping.put(CROSS, 1);
+        inventionToRequiredHidesMapping.put(JENNY_RAFT, 1);
+        inventionToRequiredHidesMapping.put(LIFEBOAT, 1);
+        inventionToRequiredHidesMapping.put(BALLISTA, 1);
+        inventionToRequiredHidesMapping.put(CANOE, 1);
+        inventionToRequiredHidesMapping.put(GARDEN, 1);
+        inventionToRequiredHidesMapping.put(TRAP, 1);
+        inventionToRequiredHidesMapping.put(TRANSQUELEZER, 1);
+
+        threatActionToRequiredTerrainsMapping.put(JAKAS_AKCJA_ZAGROZENIE, new ArrayList<>());
+//        todo c.d.
+
+        threatActionToRequiredInventionsMapping.put(JAKAS_AKCJA_ZAGROZENIE, new ArrayList<>());
+//        todo c.d.
+
+        threatActionToRequiredWoodMapping.put(JAKAS_AKCJA_ZAGROZENIE, 1);
+//        todo c.d.
+
+        threatActionToRequiredHidesMapping.put(JAKAS_AKCJA_ZAGROZENIE, 1);
+//        todo c.d.
+
+
 
         professionToSpecialSkillMapping.put(CARPENTER, new ArrayList<>(Arrays.asList(
                 ECONOMICAL_CONSTRUCTION, CRAFT, NEW_IDEA, HANDYMAN)));
@@ -652,6 +844,24 @@ public class Mappings {
         currentPhaseToNextPhaseMapping.put(WEATHER_PHASE, NIGHT_PHASE);
         currentPhaseToNextPhaseMapping.put(NIGHT_PHASE, EVENT_PHASE);
 
+        actionToAllowedMarkerMapping.put(ActionType.THREAD_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.HUNTING_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, DOG_MARKER, HUNTING_HELPER_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.BUILDING_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, BUILDING_HELPER_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.GATHERING_RESOURCES_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, GATHERING_RESOURCES_HELPER_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.EXPLORATION_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER, DOG_MARKER, EXPLORATION_HELPER_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.CAMP_ORDERING_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER)));
+        actionToAllowedMarkerMapping.put(ActionType.REST_ACTION, new ArrayList<>(Arrays.asList(CARPENTER_MARKER, COOK_MARKER, EXPLORER_MARKER, SOLDIER_MARKER, FRIDAY_MARKER)));
+
+        tilePositionToNeighboursMapping.put(1, new ArrayList<>(Arrays.asList(2, 3, 4)));
+        tilePositionToNeighboursMapping.put(2, new ArrayList<>(Arrays.asList(1, 3, 5)));
+        tilePositionToNeighboursMapping.put(3, new ArrayList<>(Arrays.asList(1, 2, 4, 5, 6, 7)));
+        tilePositionToNeighboursMapping.put(4, new ArrayList<>(Arrays.asList(1, 3, 7)));
+        tilePositionToNeighboursMapping.put(5, new ArrayList<>(Arrays.asList(2, 3, 6, 8)));
+        tilePositionToNeighboursMapping.put(6, new ArrayList<>(Arrays.asList(3, 5, 7, 8, 9, 10)));
+        tilePositionToNeighboursMapping.put(7, new ArrayList<>(Arrays.asList(3, 4, 6, 10)));
+        tilePositionToNeighboursMapping.put(8, new ArrayList<>(Arrays.asList(5, 6, 9)));
+        tilePositionToNeighboursMapping.put(9, new ArrayList<>(Arrays.asList(6, 8, 10)));
+        tilePositionToNeighboursMapping.put(10, new ArrayList<>(Arrays.asList(6, 7, 9)));
     }
 
     public static Map<InventionType, Boolean> getInventionToMultipleInventionMapping() {
@@ -916,5 +1126,85 @@ public class Mappings {
 
     public static void setBeastToBeastStatsMapping(Map<BeastType, List<Integer>> beastToBeastStatsMapping) {
         Mappings.beastToBeastStatsMapping = beastToBeastStatsMapping;
+    }
+
+    public static Map<ActionType, List<MarkerType>> getActionToAllowedMarkerMapping() {
+        return actionToAllowedMarkerMapping;
+    }
+
+    public static void setActionToAllowedMarkerMapping(Map<ActionType, List<MarkerType>> actionToAllowedMarkerMapping) {
+        Mappings.actionToAllowedMarkerMapping = actionToAllowedMarkerMapping;
+    }
+
+    public static Map<InventionType, List<TerrainType>> getInventionToRequiredTerrainsMapping() {
+        return inventionToRequiredTerrainsMapping;
+    }
+
+    public static void setInventionToRequiredTerrainsMapping(Map<InventionType, List<TerrainType>> inventionToRequiredTerrainsMapping) {
+        Mappings.inventionToRequiredTerrainsMapping = inventionToRequiredTerrainsMapping;
+    }
+
+    public static Map<InventionType, List<InventionType>> getInventionToRequiredInventionsMapping() {
+        return inventionToRequiredInventionsMapping;
+    }
+
+    public static void setInventionToRequiredInventionsMapping(Map<InventionType, List<InventionType>> inventionToRequiredInventionsMapping) {
+        Mappings.inventionToRequiredInventionsMapping = inventionToRequiredInventionsMapping;
+    }
+
+    public static Map<InventionType, Integer> getInventionToRequiredWoodMapping() {
+        return inventionToRequiredWoodMapping;
+    }
+
+    public static void setInventionToRequiredWoodMapping(Map<InventionType, Integer> inventionToRequiredWoodMapping) {
+        Mappings.inventionToRequiredWoodMapping = inventionToRequiredWoodMapping;
+    }
+
+    public static Map<InventionType, Integer> getInventionToRequiredHidesMapping() {
+        return inventionToRequiredHidesMapping;
+    }
+
+    public static void setInventionToRequiredHidesMapping(Map<InventionType, Integer> inventionToRequiredHidesMapping) {
+        Mappings.inventionToRequiredHidesMapping = inventionToRequiredHidesMapping;
+    }
+
+    public static Map<ThreatActionType, List<TerrainType>> getThreatActionToRequiredTerrainsMapping() {
+        return threatActionToRequiredTerrainsMapping;
+    }
+
+    public static void setThreatActionToRequiredTerrainsMapping(Map<ThreatActionType, List<TerrainType>> threatActionToRequiredTerrainsMapping) {
+        Mappings.threatActionToRequiredTerrainsMapping = threatActionToRequiredTerrainsMapping;
+    }
+
+    public static Map<ThreatActionType, List<InventionType>> getThreatActionToRequiredInventionsMapping() {
+        return threatActionToRequiredInventionsMapping;
+    }
+
+    public static void setThreatActionToRequiredInventionsMapping(Map<ThreatActionType, List<InventionType>> threatActionToRequiredInventionsMapping) {
+        Mappings.threatActionToRequiredInventionsMapping = threatActionToRequiredInventionsMapping;
+    }
+
+    public static Map<ThreatActionType, Integer> getThreatActionToRequiredWoodMapping() {
+        return threatActionToRequiredWoodMapping;
+    }
+
+    public static void setThreatActionToRequiredWoodMapping(Map<ThreatActionType, Integer> threatActionToRequiredWoodMapping) {
+        Mappings.threatActionToRequiredWoodMapping = threatActionToRequiredWoodMapping;
+    }
+
+    public static Map<ThreatActionType, Integer> getThreatActionToRequiredHidesMapping() {
+        return threatActionToRequiredHidesMapping;
+    }
+
+    public static void setThreatActionToRequiredHidesMapping(Map<ThreatActionType, Integer> threatActionToRequiredHidesMapping) {
+        Mappings.threatActionToRequiredHidesMapping = threatActionToRequiredHidesMapping;
+    }
+
+    public static Map<Integer, List<Integer>> getTilePositionToNeighboursMapping() {
+        return tilePositionToNeighboursMapping;
+    }
+
+    public static void setTilePositionToNeighboursMapping(Map<Integer, List<Integer>> tilePositionToNeighboursMapping) {
+        Mappings.tilePositionToNeighboursMapping = tilePositionToNeighboursMapping;
     }
 }

@@ -1,32 +1,26 @@
 package model;
 
-import controller.GameEventsListener;
+import controller.engine.GameEventsListener;
 import model.enums.elements.DiceType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
-public class Scenario implements IScenario {
+public class Scenario {
+    private Logger logger = LogManager.getLogger(Scenario.class);
+
     private int id;
     private int roundsNumber;
     private int round;
-    private Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping;
     private GameEventsListener gameEventsListener;
 
     public Scenario(int id, int roundsNumber, Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping, GameEventsListener gameEventsListener) {
         this.id = id;
         this.roundsNumber = roundsNumber;
-        this.roundIdToWeatherDicesMapping = roundIdToWeatherDicesMapping;
         this.round = 0;
         this.gameEventsListener = gameEventsListener;
-    }
-
-    public Map<Integer, List<DiceType>> getRoundIdToWeatherDicesMapping() {
-        return roundIdToWeatherDicesMapping;
-    }
-
-    public void setRoundIdToWeatherDicesMapping(Map<Integer, List<DiceType>> roundIdToWeatherDicesMapping) {
-        this.roundIdToWeatherDicesMapping = roundIdToWeatherDicesMapping;
     }
 
     public int getId() {
@@ -53,53 +47,12 @@ public class Scenario implements IScenario {
         this.round = round;
     }
 
-    public void handleTotem() {
-        switch (this.id) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void handleBook() {
-        switch (this.id) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            default:
-                break;
-        }
-    }
-
     public void nextRound() {
         round += 1;
         if (round > roundsNumber) {
             gameEventsListener.handleGameEnd();
         }
+        logger.info("********************************************************************************");
+        logger.info("Runda numer " + round);
     }
-
 }

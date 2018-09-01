@@ -6,20 +6,20 @@ import model.enums.elements.MarkerType;
 public class Marker {
     private MarkerType markerType;
     private ICharacter character;
-    private boolean isAvaible;
+    private boolean isAvailable;
 
     public Marker(MarkerType markerType, ICharacter character) {
         this.markerType = markerType;
         this.character = character;
-        this.isAvaible = true;
+        this.isAvailable = true;
     }
 
-    public boolean isAvaible() {
-        return isAvaible;
+    public boolean isAvailable() {
+        return isAvailable;
     }
 
-    public void setAvaible(boolean avaible) {
-        isAvaible = avaible;
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
 
     public ICharacter getCharacter() {

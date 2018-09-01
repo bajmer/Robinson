@@ -2,7 +2,7 @@ package model.cards;
 
 import model.enums.cards.StartingItemType;
 
-public class StartingItemCard implements Usable {
+public class StartingItemCard {
     private static final int maxUseNumber = 2;
     private StartingItemType itemType;
     private int useLeftNumber;
@@ -12,7 +12,6 @@ public class StartingItemCard implements Usable {
         this.useLeftNumber = maxUseNumber;
     }
 
-    @Override
     public void use() {
         //todo
         this.useLeftNumber--;

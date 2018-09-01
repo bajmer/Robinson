@@ -12,6 +12,8 @@ import java.util.List;
 public class GameInfo {
     private static Logger logger = LogManager.getLogger(GameInfo.class);
 
+    private static boolean Friday = false;
+    private static boolean Dog = false;
     private static List<ICharacter> characters = new ArrayList<>();
     private static List<InventionCard> ideas = new ArrayList<>();
     private static List<InventionCard> inventions = new ArrayList<>();
@@ -19,9 +21,10 @@ public class GameInfo {
     private static List<StartingItemCard> startingItems = new ArrayList<>();
     private static List<IslandTile> discoveredTiles = new ArrayList<>();
     private static LinkedList<EventCard> threatActionCards = new LinkedList<>();
-    private static LinkedList<BeastCard> avaibleBeastCards = new LinkedList<>();
+    private static LinkedList<BeastCard> availableBeastCards = new LinkedList<>();
     private static List<Marker> allSelectionMarkers = new ArrayList<>();
-    private static Resources avaibleResources = new Resources();
+    private static Resources availableResources = new Resources();
+    private static Resources tmpAvailableResources = new Resources();
     private static Resources futureResources = new Resources();
     private static Character firstPlayer;
     private static IslandTile camp;
@@ -34,8 +37,8 @@ public class GameInfo {
     private static int productionWoodNumber = 1;
     public GameInfo() {
     }
-
     private static void decreaseLifeForAllCharacters(int value) {
+        logger.debug("Zmiana liczby żyć wszystkich postaci o " + value);
         characters.forEach(character -> {
             if (character instanceof Character) {
                 character.changeLife(value);
@@ -53,39 +56,43 @@ public class GameInfo {
         }
 
         if (moraleLevel != beginMoraleLevel) {
-            logger.info("Zmiana morale! Teraz wynosi: " + moraleLevel);
+            logger.info("Zmiana morale o " + value + "! Teraz wynosi: " + moraleLevel);
         }
     }
 
     public static void changeFoodLevel(int value) {
-        avaibleResources.setFoodAmount(avaibleResources.getFoodAmount() + value);
-        if (avaibleResources.getFoodAmount() < 0) {
-            avaibleResources.setLongExpiryDateFoodAmount(avaibleResources.getLongExpiryDateFoodAmount() + avaibleResources.getFoodAmount());
-            avaibleResources.setFoodAmount(0);
-            if (avaibleResources.getLongExpiryDateFoodAmount() < 0) {
-                decreaseLifeForAllCharacters(avaibleResources.getLongExpiryDateFoodAmount());
-                avaibleResources.setLongExpiryDateFoodAmount(0);
+        logger.debug("Zmiana ilości żywności o " + value);
+        availableResources.setFoodAmount(availableResources.getFoodAmount() + value);
+        if (availableResources.getFoodAmount() < 0) {
+            availableResources.setLongExpiryDateFoodAmount(availableResources.getLongExpiryDateFoodAmount() + availableResources.getFoodAmount());
+            availableResources.setFoodAmount(0);
+            if (availableResources.getLongExpiryDateFoodAmount() < 0) {
+                decreaseLifeForAllCharacters(availableResources.getLongExpiryDateFoodAmount());
+                availableResources.setLongExpiryDateFoodAmount(0);
             }
         }
     }
 
     public static void changeWoodLevel(int value) {
-        avaibleResources.setWoodAmount(avaibleResources.getWoodAmount() + value);
-        if (avaibleResources.getWoodAmount() < 0) {
-            decreaseLifeForAllCharacters(avaibleResources.getWoodAmount());
-            avaibleResources.setWoodAmount(0);
+        logger.debug("Zmiana ilości drewna o " + value);
+        availableResources.setWoodAmount(availableResources.getWoodAmount() + value);
+        if (availableResources.getWoodAmount() < 0) {
+            decreaseLifeForAllCharacters(availableResources.getWoodAmount());
+            availableResources.setWoodAmount(0);
         }
     }
 
     public static void changeHideLevel(int value) {
-        avaibleResources.setHideAmount(avaibleResources.getHideAmount() + value);
-        if (avaibleResources.getHideAmount() < 0) {
-            decreaseLifeForAllCharacters(avaibleResources.getHideAmount());
-            avaibleResources.setHideAmount(0);
+        logger.debug("Zmiana ilości skór o " + value);
+        availableResources.setHideAmount(availableResources.getHideAmount() + value);
+        if (availableResources.getHideAmount() < 0) {
+            decreaseLifeForAllCharacters(availableResources.getHideAmount());
+            availableResources.setHideAmount(0);
         }
     }
 
     public static void changePalisadeLevel(int value) {
+        logger.debug("Zmiana poziomu palisady o " + value);
         palisadeLevel += value;
         if (palisadeLevel < 0) {
             decreaseLifeForAllCharacters(palisadeLevel);
@@ -94,6 +101,7 @@ public class GameInfo {
     }
 
     public static void changeRoofLevel(int value) {
+        logger.debug("Zmiana poziomu dachu o " + value);
         roofLevel += value;
         if (roofLevel < 0) {
             decreaseLifeForAllCharacters(roofLevel);
@@ -102,11 +110,28 @@ public class GameInfo {
     }
 
     public static void changeWeaponLevel(int value) {
+        logger.debug("Zmiana poziomu broni o " + value);
         weaponLevel += value;
         if (weaponLevel < 0) {
             decreaseLifeForAllCharacters(weaponLevel);
             weaponLevel = 0;
         }
+    }
+
+    public static boolean isFriday() {
+        return Friday;
+    }
+
+    public static void setFriday(boolean friday) {
+        GameInfo.Friday = friday;
+    }
+
+    public static boolean isDog() {
+        return Dog;
+    }
+
+    public static void setDog(boolean dog) {
+        GameInfo.Dog = dog;
     }
 
     public static int getMoraleLevel() {
@@ -173,12 +198,12 @@ public class GameInfo {
         GameInfo.threatActionCards = threatActionCards;
     }
 
-    public static LinkedList<BeastCard> getAvaibleBeastCards() {
-        return avaibleBeastCards;
+    public static LinkedList<BeastCard> getAvailableBeastCards() {
+        return availableBeastCards;
     }
 
-    public static void setAvaibleBeastCards(LinkedList<BeastCard> avaibleBeastCards) {
-        GameInfo.avaibleBeastCards = avaibleBeastCards;
+    public static void setAvailableBeastCards(LinkedList<BeastCard> availableBeastCards) {
+        GameInfo.availableBeastCards = availableBeastCards;
     }
 
     public static List<Marker> getAllSelectionMarkers() {
@@ -189,12 +214,12 @@ public class GameInfo {
         GameInfo.allSelectionMarkers = allSelectionMarkers;
     }
 
-    public static Resources getAvaibleResources() {
-        return avaibleResources;
+    public static Resources getAvailableResources() {
+        return availableResources;
     }
 
-    public static void setAvaibleResources(Resources avaibleResources) {
-        GameInfo.avaibleResources = avaibleResources;
+    public static void setAvailableResources(Resources availableResources) {
+        GameInfo.availableResources = availableResources;
     }
 
     public static Resources getFutureResources() {
@@ -267,5 +292,13 @@ public class GameInfo {
 
     public static void setProductionWoodNumber(int productionWoodNumber) {
         GameInfo.productionWoodNumber = productionWoodNumber;
+    }
+
+    public static Resources getTmpAvailableResources() {
+        return tmpAvailableResources;
+    }
+
+    public static void setTmpAvailableResources(Resources tmpAvailableResources) {
+        GameInfo.tmpAvailableResources = tmpAvailableResources;
     }
 }

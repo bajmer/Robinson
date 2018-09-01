@@ -1,0 +1,11 @@
+package model.enums.action;
+
+public enum ActionType {
+    THREAD_ACTION,
+    HUNTING_ACTION,
+    BUILDING_ACTION,
+    GATHERING_RESOURCES_ACTION,
+    EXPLORATION_ACTION,
+    CAMP_ORDERING_ACTION,
+    REST_ACTION
+}

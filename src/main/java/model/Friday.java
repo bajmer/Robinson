@@ -1,6 +1,6 @@
 package model;
 
-import controller.GameEventsListener;
+import controller.engine.GameEventsListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

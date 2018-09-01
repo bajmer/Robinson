@@ -11,7 +11,7 @@ public class Decks {
     private static LinkedList<GatheringResourcesAdventureCard> gatheringResourcesAdventureCardsDeck = new LinkedList<>();
     private static LinkedList<ExplorationAdventureCard> explorationAdventureCardsDeck = new LinkedList<>();
     private static LinkedList<BeastCard> beastCardsDeck = new LinkedList<>();
-    private static LinkedList<Usable> mysteryCardsDeck = new LinkedList<>();
+    private static LinkedList<Mysterious> mysteryCardsDeck = new LinkedList<>();
     private static LinkedList<IslandTile> islandTilesStack = new LinkedList<>();
     private static LinkedList<DiscoveryToken> discoveryTokensStack = new LinkedList<>();
 
@@ -63,11 +63,11 @@ public class Decks {
         Decks.beastCardsDeck = beastCardsDeck;
     }
 
-    public static LinkedList<Usable> getMysteryCardsDeck() {
+    public static LinkedList<Mysterious> getMysteryCardsDeck() {
         return mysteryCardsDeck;
     }
 
-    public static void setMysteryCardsDeck(LinkedList<Usable> mysteryCardsDeck) {
+    public static void setMysteryCardsDeck(LinkedList<Mysterious> mysteryCardsDeck) {
         Decks.mysteryCardsDeck = mysteryCardsDeck;
     }
 

@@ -1,27 +1,32 @@
 package model.cards;
 
+import model.ActionRequirements;
+import model.Mappings;
 import model.enums.ProfessionType;
-import model.enums.TerrainType;
 import model.enums.cards.InventionType;
 
-public class InventionCard implements Usable {
+public class InventionCard implements RequirableCard {
     private InventionType invention;
     private boolean isMandatory;
     private boolean isIdea;
     private ProfessionType owner;
     private boolean multipleIdea;
-    private TerrainType requiredTerrain;
-    private InventionCard requiredItem;
-    private int requiredWoods;
-    private int requiredHides;
+    private ActionRequirements actionRequirements;
+    private boolean availableToBuild;
 
     public InventionCard(InventionType invention, boolean isMandatory, ProfessionType owner, boolean multipleIdea) {
         this.invention = invention;
         this.isMandatory = isMandatory;
         this.owner = owner;
         this.multipleIdea = multipleIdea;
-
         this.isIdea = true;
+
+        actionRequirements = new ActionRequirements(
+                Mappings.getInventionToRequiredTerrainsMapping().get(invention),
+                Mappings.getInventionToRequiredInventionsMapping().get(invention),
+                Mappings.getInventionToRequiredWoodMapping().get(invention),
+                Mappings.getInventionToRequiredHidesMapping().get(invention)
+        );
     }
 
     public boolean isMultipleIdea() {
@@ -64,9 +69,20 @@ public class InventionCard implements Usable {
         isIdea = idea;
     }
 
-    @Override
-    public void use() {
+    public ActionRequirements getActionRequirements() {
+        return actionRequirements;
+    }
 
+    public void setActionRequirements(ActionRequirements actionRequirements) {
+        this.actionRequirements = actionRequirements;
+    }
+
+    public boolean isAvailableToBuild() {
+        return availableToBuild;
+    }
+
+    public void setAvailableToBuild(boolean availableToBuild) {
+        this.availableToBuild = availableToBuild;
     }
 
     @Override
